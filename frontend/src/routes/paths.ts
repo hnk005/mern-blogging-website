@@ -5,8 +5,8 @@ export const rootPaths = {
 
 export default {
   home: `${rootPaths.homeRoot}`,
-  editor: `${rootPaths.homeRoot}/editor`,
-  signin: `${rootPaths.homeRoot}/sign-in`,
-  signup: `${rootPaths.homeRoot}/sign-up`,
+  editor: `/editor`,
+  signin: `/sign-in`,
+  signup: `/sign-up`,
   // 404: `/${rootPaths.errorRoot}/404`,
 };

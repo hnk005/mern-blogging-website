@@ -3,8 +3,9 @@ import { AuthPageProps } from "@/pages/AuthPage";
 import googleIcon from "@/assets/google.png";
 import { Link } from "react-router-dom";
 import paths from "@/routes/paths";
-import { Formik, Form, ErrorMessage } from "formik";
+import { Formik, Form } from "formik";
 import { SignInSchema, SignUpSchema } from "./AuthFormSchema";
+import { globalLoading } from "react-global-loading";
 
 type SignInValues = {
   email: string;
@@ -19,6 +20,7 @@ type SignUpValues = {
 
 const AuthForm = ({ type }: AuthPageProps) => {
   const isSignIn = type === "sign-in";
+  const { show, hide } = globalLoading;
 
   const initialValues: SignInValues | SignUpValues = isSignIn
     ? {
@@ -34,6 +36,8 @@ const AuthForm = ({ type }: AuthPageProps) => {
 
   const handleSubmit = (values: SignInValues | SignUpValues) => {
     console.log("Form data:", values);
+    show();
+    setTimeout(() => hide(), 2000);
     // call API or whatever
   };
 

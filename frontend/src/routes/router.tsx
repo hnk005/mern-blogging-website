@@ -3,6 +3,7 @@ import { Outlet, RouteObject, createBrowserRouter } from "react-router-dom";
 import { rootPaths } from "./paths";
 import paths from "./paths";
 import { AuthPageProps } from "@/pages/AuthPage";
+import PageLoader from "@/components/loader/PageLoader";
 
 const App = lazy<() => ReactElement>(() => import("@/App"));
 
@@ -17,7 +18,7 @@ const AuthPage = lazy<({ type }: AuthPageProps) => ReactElement>(
 const routes: RouteObject[] = [
   {
     element: (
-      <Suspense>
+      <Suspense fallback={<PageLoader />}>
         <App />
       </Suspense>
     ),
@@ -26,7 +27,7 @@ const routes: RouteObject[] = [
         path: paths.home,
         element: (
           <MainLayout>
-            <Suspense>
+            <Suspense fallback={<PageLoader />}>
               <Outlet />
             </Suspense>
           </MainLayout>

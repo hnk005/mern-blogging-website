@@ -1,3 +1,4 @@
+import AnimationWrapper from "@/components/animation/AnimationWrapper";
 import AuthForm from "@/feature/auth/AuthForm";
 
 export type AuthPageProps = {
@@ -6,9 +7,11 @@ export type AuthPageProps = {
 
 const AuthPage = ({ type }: AuthPageProps) => {
   return (
-    <section className="h-cover flex items-center justify-center">
-      <AuthForm type={type} />
-    </section>
+    <AnimationWrapper keyValue={type}>
+      <section className="h-cover flex items-center justify-center">
+        <AuthForm type={type} />
+      </section>
+    </AnimationWrapper>
   );
 };
 

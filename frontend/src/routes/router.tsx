@@ -1,16 +1,17 @@
 import { lazy, Suspense, ReactElement, PropsWithChildren } from "react";
-import {
-  Outlet,
-  RouteObject,
-  createBrowserRouter,
-} from "react-router-dom";
+import { Outlet, RouteObject, createBrowserRouter } from "react-router-dom";
 import { rootPaths } from "./paths";
 import paths from "./paths";
+import { AuthPageProps } from "@/pages/AuthPage";
 
 const App = lazy<() => ReactElement>(() => import("@/App"));
 
 const MainLayout = lazy<({ children }: PropsWithChildren) => ReactElement>(
   () => import("@/layouts/MainLayout")
+);
+
+const AuthPage = lazy<({ type }: AuthPageProps) => ReactElement>(
+  () => import("@/pages/AuthPage")
 );
 
 const routes: RouteObject[] = [
@@ -31,6 +32,14 @@ const routes: RouteObject[] = [
           </MainLayout>
         ),
         children: [
+          {
+            path: paths.signin,
+            element: <AuthPage type="sign-in" />,
+          },
+          {
+            path: paths.signup,
+            element: <AuthPage type="sign-up" />,
+          },
           // {
           //   path: paths.home,
           //   index: true,

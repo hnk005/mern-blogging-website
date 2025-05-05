@@ -1,12 +1,13 @@
 import process from "process";
 import express, { Express } from "express";
 import dotenv from "dotenv";
-import mongoose from "mongoose";
-import cors from "cors";
+// import mongoose from "mongoose";
+// import cors from "cors";
 import bodyParser from "body-parser";
-import morgan from "morgan";
-import cookieParser from "cookie-parser";
-// import router from "./routers";
+// import morgan from "morgan";
+// import cookieParser from "cookie-parser";
+import { connectionDB } from "./config/connectionDB";
+import router from "./routers";
 // import { createClient } from "redis";
 // import errorMiddleware from "./middlewares/error.middleware";
 
@@ -19,21 +20,18 @@ const port = process.env.PORT || 3000;
 
 // // Middleware
 // app.use(cors());
-// app.use(bodyParser.json());
+app.use(bodyParser.json());
 // app.use(morgan("dev"));
 // app.use(cookieParser());
 
 // // Error handling middleware
 // app.use(errorMiddleware);
 
-// // Database Connection
-// mongoose
-//   .connect(process.env.MONGODB_URI)
-//   .then(() => console.log("Đã kết nối Database thành công"))
-//   .catch((err) => console.error("Lỗi kết nối Database:", err));
+// Database Connection
+connectionDB();
 
-// // Routes
-// app.use("/api", router);
+// Routes
+app.use("/api", router);
 
 app.listen(port, () => {
   console.log(`Server runing at http://localhost:${port}`);

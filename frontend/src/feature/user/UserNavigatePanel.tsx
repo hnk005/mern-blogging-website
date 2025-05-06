@@ -17,7 +17,7 @@ const UserNavigatePanel = () => {
           <i className="fi fi-rr-file-edit"></i>
           <p>Write</p>
         </Link>
-        <Link to={`user/${username}`} className="link pl-8 py-4">
+        <Link to={`/user/${username}`} className="link pl-8 py-4">
           Profile
         </Link>
         <Link to="/dashboard/blogs" className="link pl-8 py-4">

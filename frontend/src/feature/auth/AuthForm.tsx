@@ -3,26 +3,16 @@ import { AuthPageProps } from "@/pages/AuthPage";
 import googleIcon from "@/assets/google.png";
 import { Link } from "react-router-dom";
 import paths from "@/routes/paths";
-import { Formik, Form } from "formik";
+import { Formik, Form, FormikHelpers } from "formik";
 import { SignInSchema, SignUpSchema } from "./AuthFormSchema";
-import { globalLoading } from "react-global-loading";
-
-type SignInValues = {
-  email: string;
-  password: string;
-};
-
-type SignUpValues = {
-  fullname: string;
-  email: string;
-  password: string;
-};
+import { useAuth } from "@/context/AuthContext";
+import { SignInRequest, SignUpRequest } from "@/types/auth.type";
 
 const AuthForm = ({ type }: AuthPageProps) => {
+  const { signin, signup } = useAuth();
   const isSignIn = type === "sign-in";
-  const { show, hide } = globalLoading;
 
-  const initialValues: SignInValues | SignUpValues = isSignIn
+  const initialValues: SignInRequest | SignUpRequest = isSignIn
     ? {
         email: "",
         password: "",
@@ -34,11 +24,12 @@ const AuthForm = ({ type }: AuthPageProps) => {
       };
   const validationSchema = isSignIn ? SignInSchema : SignUpSchema;
 
-  const handleSubmit = (values: SignInValues | SignUpValues) => {
-    console.log("Form data:", values);
-    show();
-    setTimeout(() => hide(), 2000);
-    // call API or whatever
+  const handleSubmit = async (values: SignInRequest | SignUpRequest) => {
+    if (isSignIn) {
+      signin(values as SignInRequest);
+    } else {
+      signup(values as SignUpRequest);
+    }
   };
 
   return (

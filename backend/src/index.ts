@@ -1,40 +1,31 @@
-// import process from "process";
-// import express, { Express } from "express";
-// import dotenv from "dotenv";
-// import mongoose from "mongoose";
-// import cors from "cors";
-// import bodyParser from "body-parser";
-// import morgan from "morgan";
-// import cookieParser from "cookie-parser";
-// import router from "./routers";
+import process from "process";
+import express, { Express } from "express";
+import dotenv from "dotenv";
+import { connectionDB } from "./config/connectionDB";
+import router from "./routers";
+import middleware from "./config/middleware";
+import errorMiddleware from "./middlewares/error.middleware";
 // import { createClient } from "redis";
-// import errorMiddleware from "./middlewares/error.middleware";
 
-// dotenv.config();
+dotenv.config();
 
-// const app: Express = express();
-// const port = process.env.PORT || 3000;
+const app: Express = express();
+const port = process.env.PORT || 3000;
 
 // export const redisClient = createClient();
 
 // // Middleware
-// app.use(cors());
-// app.use(bodyParser.json());
-// app.use(morgan("dev"));
-// app.use(cookieParser());
+middleware(app);
+
+// Database Connection
+connectionDB();
+
+// Routes
+app.use("/api", router);
 
 // // Error handling middleware
-// app.use(errorMiddleware);
+app.use(errorMiddleware);
 
-// // Database Connection
-// mongoose
-//   .connect(process.env.MONGODB_URI)
-//   .then(() => console.log("Đã kết nối Database thành công"))
-//   .catch((err) => console.error("Lỗi kết nối Database:", err));
-
-// // Routes
-// app.use("/api", router);
-
-// app.listen(port, () => {
-//   console.log(`Server đang chạy tại http://localhost:${port}`);
-// });
+app.listen(port, () => {
+  console.log(`Server runing at http://localhost:${port}`);
+});

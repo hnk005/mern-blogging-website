@@ -1,15 +1,11 @@
 import process from "process";
 import express, { Express } from "express";
 import dotenv from "dotenv";
-// import mongoose from "mongoose";
-// import cors from "cors";
-import bodyParser from "body-parser";
-// import morgan from "morgan";
-// import cookieParser from "cookie-parser";
 import { connectionDB } from "./config/connectionDB";
 import router from "./routers";
+import middleware from "./config/middleware";
+import errorMiddleware from "./middlewares/error.middleware";
 // import { createClient } from "redis";
-// import errorMiddleware from "./middlewares/error.middleware";
 
 dotenv.config();
 
@@ -19,19 +15,16 @@ const port = process.env.PORT || 3000;
 // export const redisClient = createClient();
 
 // // Middleware
-// app.use(cors());
-app.use(bodyParser.json());
-// app.use(morgan("dev"));
-// app.use(cookieParser());
-
-// // Error handling middleware
-// app.use(errorMiddleware);
+middleware(app);
 
 // Database Connection
 connectionDB();
 
 // Routes
 app.use("/api", router);
+
+// // Error handling middleware
+app.use(errorMiddleware);
 
 app.listen(port, () => {
   console.log(`Server runing at http://localhost:${port}`);

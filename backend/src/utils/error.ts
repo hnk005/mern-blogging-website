@@ -38,7 +38,7 @@ export class APIError extends BaseError {
 
 class ErrorHandler {
   public async handleError(err: Error): Promise<void> {
-    await console.error(
+    console.error(
       "Error message from the centralized error-handling component: ",
       err
     );

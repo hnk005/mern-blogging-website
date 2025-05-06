@@ -12,13 +12,12 @@ const errorMiddleware = (
   if (!isTrustedError(err)) {
     next(err);
   }
-  handleError(err);
   const httpCode = err instanceof APIError && err.httpCode;
   if (httpCode) {
     res.status(httpCode).json({ message: err.message, error: err.cause });
     return;
   }
-  next(err);
+  handleError(err);
 };
 
 export default errorMiddleware;

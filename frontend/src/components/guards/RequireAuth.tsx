@@ -8,7 +8,7 @@ const RequireAuth = ({ children }: PropsWithChildren) => {
   const { user } = useAuth();
   const location = useLocation();
 
-  if (!user) {
+  if (!user.access_token) {
     return <Navigate to={paths.signin} state={{ from: location }} replace />;
   }
 

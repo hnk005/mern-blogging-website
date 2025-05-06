@@ -22,7 +22,7 @@ const Navbar = () => {
   };
 
   const handleBlurUserNavPanel = () => {
-    setTimeout(() => setSearchBoxVisibility(false), 200);
+    setTimeout(() => setShowUserNavPanel(false), 200);
   };
 
   return (

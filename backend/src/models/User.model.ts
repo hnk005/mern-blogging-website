@@ -62,7 +62,8 @@ const userSchema = new Schema<IUser>(
         type: String,
         lowercase: true,
         required: true,
-        minlength: [3, "fullname must be 3 letters long"],
+        minlength: [3, "fullname must be at least 3 letters long"],
+        maxlength: [50, "fullname must be at most 50 letters long"],
       },
       email: {
         type: String,
@@ -76,12 +77,12 @@ const userSchema = new Schema<IUser>(
       },
       username: {
         type: String,
-        minlength: [3, "Username must be 3 letters long"],
+        minlength: [3, "Username must be at least 3 letters long"],
         unique: true,
       },
       bio: {
         type: String,
-        maxlength: [200, "Bio should not be more than 200"],
+        maxlength: [200, "Bio should not  be at most more than 200"],
         default: "",
       },
       profile_img: {

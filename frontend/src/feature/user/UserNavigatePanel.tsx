@@ -5,7 +5,7 @@ import { Link } from "react-router-dom";
 const UserNavigatePanel = () => {
   const {
     user: { username },
-    signout,
+    signOut,
   } = useAuth();
   return (
     <AnimationWrapper
@@ -29,7 +29,7 @@ const UserNavigatePanel = () => {
         <span className="absolute border-t border-grey w-full"></span>
         <button
           className="text-left p-4 hover:bg-grey w-full pl-8 py-4"
-          onClick={signout}
+          onClick={signOut}
         >
           <h1 className="font-bold text-xl mg-1">Sign Out</h1>
           <p>@{username}</p>

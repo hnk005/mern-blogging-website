@@ -3,13 +3,13 @@ import { AuthPageProps } from "@/pages/AuthPage";
 import googleIcon from "@/assets/google.png";
 import { Link } from "react-router-dom";
 import paths from "@/routes/paths";
-import { Formik, Form, FormikHelpers } from "formik";
+import { Formik, Form } from "formik";
 import { SignInSchema, SignUpSchema } from "./AuthFormSchema";
 import { useAuth } from "@/context/AuthContext";
 import { SignInRequest, SignUpRequest } from "@/types/auth.type";
 
 const AuthForm = ({ type }: AuthPageProps) => {
-  const { signin, signup } = useAuth();
+  const { signIn, googleAuth, signUp } = useAuth();
   const isSignIn = type === "sign-in";
 
   const initialValues: SignInRequest | SignUpRequest = isSignIn
@@ -26,9 +26,9 @@ const AuthForm = ({ type }: AuthPageProps) => {
 
   const handleSubmit = async (values: SignInRequest | SignUpRequest) => {
     if (isSignIn) {
-      signin(values as SignInRequest);
+      signIn(values as SignInRequest);
     } else {
-      signup(values as SignUpRequest);
+      signUp(values as SignUpRequest);
     }
   };
 
@@ -83,6 +83,7 @@ const AuthForm = ({ type }: AuthPageProps) => {
             </div>
 
             <button
+              onClick={googleAuth}
               type="button"
               className="btn-dark flex items-center justify-center gap-4 w-[90%] center"
             >
@@ -94,7 +95,7 @@ const AuthForm = ({ type }: AuthPageProps) => {
               <p className="mt-6 text-dark-grey text-xl text-center">
                 Don't have an account?
                 <Link
-                  to={paths.signup}
+                  to={paths.signUp}
                   className="underline text-black text-xl ml-1"
                 >
                   Join us today.
@@ -104,7 +105,7 @@ const AuthForm = ({ type }: AuthPageProps) => {
               <p className="mt-6 text-dark-grey text-xl text-center">
                 Already a member?
                 <Link
-                  to={paths.signin}
+                  to={paths.signIn}
                   className="underline text-black text-xl ml-1"
                 >
                   Sign in here.

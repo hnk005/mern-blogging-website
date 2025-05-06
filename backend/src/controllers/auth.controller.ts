@@ -130,7 +130,7 @@ export const googleAuth = async (
       }
 
       res.status(StatusCodes.OK).json(formatDataToSend(user));
-      next();
+      return;
     }
 
     const username = await generateUsername(email);

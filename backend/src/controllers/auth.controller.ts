@@ -2,11 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import { StatusCodes } from "http-status-codes";
 import bcrypt from "bcryptjs";
 import UserModel from "@/models/User.model";
-import {
-  formatDataToSend,
-  generateUsername,
-  isUser,
-} from "@/services/auth.service";
+import { formatDataToSend, generateUsername } from "@/services/auth.service";
 import { APIError } from "@/utils/error";
 import { getAuth } from "firebase-admin/auth";
 
@@ -60,12 +56,12 @@ export const signin = async (
 ) => {
   const { email, password } = req.body;
   try {
-    const user = await isUser(email, password);
+    const user = await UserModel.findOne({ "personal_info.email": email });
     if (!user) {
       throw new APIError(
-        "UNAUTHORIZED",
-        StatusCodes.UNAUTHORIZED,
-        "Email or password is incorrect"
+        "CONFLICT",
+        StatusCodes.CONFLICT,
+        "Email doesn't exist"
       );
     }
 
@@ -75,6 +71,21 @@ export const signin = async (
         StatusCodes.FORBIDDEN,
         "Account was created using google. Try logging in with google"
       );
+    }
+
+    if (user.personal_info.password) {
+      const isUser = await bcrypt.compare(
+        password,
+        user.personal_info.password
+      );
+
+      if (!isUser) {
+        throw new APIError(
+          "UNAUTHORIZED",
+          StatusCodes.UNAUTHORIZED,
+          "Email or password is incorrect"
+        );
+      }
     }
 
     res.status(StatusCodes.OK).json(formatDataToSend(user));

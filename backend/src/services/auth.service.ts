@@ -1,6 +1,5 @@
 import UserModel, { IUser } from "@/models/User.model";
 import { nanoid } from "nanoid";
-import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 
 export const generateUsername = async (email: string): Promise<string> => {
@@ -28,15 +27,4 @@ export const formatDataToSend = (user: IUser) => {
     username: user.personal_info.username,
     fullname: user.personal_info.fullname,
   };
-};
-
-export const isUser = async (email: string, password: string) => {
-  const user = await UserModel.findOne({ "personal_info.email": email });
-
-  if (user) {
-    return (await bcrypt.compare(password, user.personal_info.password))
-      ? user
-      : null;
-  }
-  return null;
 };

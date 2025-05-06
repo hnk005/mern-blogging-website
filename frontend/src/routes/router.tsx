@@ -4,6 +4,7 @@ import { rootPaths } from "./paths";
 import paths from "./paths";
 import { AuthPageProps } from "@/pages/AuthPage";
 import PageLoader from "@/components/loader/PageLoader";
+import RequireAuth from "@/components/guards/RequireAuth";
 
 const App = lazy<() => ReactElement>(() => import("@/App"));
 
@@ -14,6 +15,8 @@ const MainLayout = lazy<({ children }: PropsWithChildren) => ReactElement>(
 const AuthPage = lazy<({ type }: AuthPageProps) => ReactElement>(
   () => import("@/pages/AuthPage")
 );
+
+const HomePage = lazy<() => ReactElement>(() => import("@/pages/HomePage"));
 
 const routes: RouteObject[] = [
   {
@@ -34,6 +37,15 @@ const routes: RouteObject[] = [
         ),
         children: [
           {
+            path: paths.home,
+            index: true,
+            element: (
+              <RequireAuth>
+                <HomePage />
+              </RequireAuth>
+            ),
+          },
+          {
             path: paths.signin,
             element: <AuthPage type="sign-in" />,
           },
@@ -41,11 +53,6 @@ const routes: RouteObject[] = [
             path: paths.signup,
             element: <AuthPage type="sign-up" />,
           },
-          // {
-          //   path: paths.home,
-          //   index: true,
-          //   element: <Order />,
-          // },
         ],
       },
     ],

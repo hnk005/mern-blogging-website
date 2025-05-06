@@ -1,1 +1,1 @@
-export const passwordRegex = /^[a-zA-Z\s]+$/;
+export const fullnameRegex = /^[a-zA-Z\s]+$/;

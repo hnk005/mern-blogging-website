@@ -4,7 +4,7 @@ import { rootPaths } from "./paths";
 import paths from "./paths";
 import { AuthPageProps } from "@/pages/AuthPage";
 import PageLoader from "@/components/loader/PageLoader";
-import RequireAuth from "@/components/guards/RequireAuth";
+import ProtectRoutes from "@/components/guards/ProtectRoutes";
 
 const App = lazy<() => ReactElement>(() => import("@/App"));
 
@@ -37,20 +37,21 @@ const routes: RouteObject[] = [
         ),
         children: [
           {
-            path: paths.home,
-            index: true,
-            element: (
-              <RequireAuth>
-                <HomePage />
-              </RequireAuth>
-            ),
+            element: <ProtectRoutes />,
+            children: [
+              {
+                path: paths.home,
+                index: true,
+                element: <HomePage />,
+              },
+            ],
           },
           {
-            path: paths.signin,
+            path: paths.signIn,
             element: <AuthPage type="sign-in" />,
           },
           {
-            path: paths.signup,
+            path: paths.signUp,
             element: <AuthPage type="sign-up" />,
           },
         ],

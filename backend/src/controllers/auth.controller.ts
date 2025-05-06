@@ -8,6 +8,7 @@ import {
   isUser,
 } from "@/services/auth.service";
 import { APIError } from "@/utils/error";
+import { getAuth } from "firebase-admin/auth";
 
 export const signup = async (
   req: Request,
@@ -67,6 +68,73 @@ export const signin = async (
         "Email or password is incorrect"
       );
     }
+
+    if (user.google_auth) {
+      throw new APIError(
+        "FORBIDDEN ",
+        StatusCodes.FORBIDDEN,
+        "Account was created using google. Try logging in with google"
+      );
+    }
+
+    res.status(StatusCodes.OK).json(formatDataToSend(user));
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const googleAuth = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const { access_token } = req.body;
+
+  try {
+    const decodedUser = await getAuth().verifyIdToken(access_token);
+
+    const { email, picture, name } = decodedUser;
+
+    if (!email || !picture || !name) {
+      throw new APIError(
+        "BAD_REQUEST",
+        StatusCodes.BAD_REQUEST,
+        "Missing required user info"
+      );
+    }
+
+    let user = await UserModel.findOne({
+      "personal_info.email": email,
+    }).select(
+      "personal_info.fullname personal_info.username personal_info.profile_img google_auth"
+    );
+
+    if (user) {
+      if (!user.google_auth) {
+        throw new APIError(
+          "FORBIDDEN",
+          StatusCodes.FORBIDDEN,
+          "This email was up without google. Please login with password to access the acount"
+        );
+      }
+
+      res.status(StatusCodes.OK).json(formatDataToSend(user));
+      next();
+    }
+
+    const username = await generateUsername(email);
+
+    user = new UserModel({
+      personal_info: {
+        fullname: name,
+        email,
+        profile_img: picture,
+        username,
+      },
+      google_auth: true,
+    });
+
+    await user.save();
 
     res.status(StatusCodes.OK).json(formatDataToSend(user));
   } catch (error) {

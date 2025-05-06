@@ -77,10 +77,10 @@ const Navbar = () => {
           </>
         ) : (
           <>
-            <Link to={paths.signin} className="btn-dark py-2">
+            <Link to={paths.signIn} className="btn-dark py-2">
               Sign In
             </Link>
-            <Link to={paths.signup} className="btn-light py-2 hidden md:block">
+            <Link to={paths.signUp} className="btn-light py-2 hidden md:block">
               Sign Up
             </Link>
           </>

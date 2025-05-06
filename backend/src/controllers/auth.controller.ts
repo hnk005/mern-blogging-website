@@ -7,6 +7,7 @@ import {
   generateUsername,
   isUser,
 } from "@/services/auth.service";
+import { APIError } from "@/utils/error";
 
 export const signup = async (
   req: Request,
@@ -16,20 +17,16 @@ export const signup = async (
   const { fullname, email, password } = req.body;
 
   try {
-    if (!fullname || !email || !password) {
-      res.status(StatusCodes.BAD_REQUEST).json({ message: "Invalid request" });
-      return;
-    }
-
     const emailExist = await UserModel.findOne({
       "personal_info.email": email,
     });
 
     if (emailExist) {
-      res.status(StatusCodes.CONFLICT).json({
-        message: "Email already exists",
-      });
-      return;
+      throw new APIError(
+        "CONFLICT",
+        StatusCodes.CONFLICT,
+        "Email already exists"
+      );
     }
 
     const username = await generateUsername(email);
@@ -62,20 +59,16 @@ export const signin = async (
 ) => {
   const { email, password } = req.body;
   try {
-    if (!email || !password) {
-      res.status(StatusCodes.BAD_REQUEST).json({ message: "Invalid request" });
-      return;
-    }
-
     const user = await isUser(email, password);
-    if (user) {
-      res.status(StatusCodes.CREATED).json(formatDataToSend(user));
-      return;
+    if (!user) {
+      throw new APIError(
+        "UNAUTHORIZED",
+        StatusCodes.UNAUTHORIZED,
+        "Email or password is incorrect"
+      );
     }
 
-    res
-      .status(StatusCodes.UNAUTHORIZED)
-      .json({ message: "Email or password is incorrect" });
+    res.status(StatusCodes.OK).json(formatDataToSend(user));
   } catch (error) {
     next(error);
   }

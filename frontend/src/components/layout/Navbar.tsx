@@ -3,9 +3,27 @@ import logo from "@/assets/logo.png";
 import { useState } from "react";
 import clsx from "clsx";
 import paths from "@/routes/paths";
+import { useAuth } from "@/context/AuthContext";
+import UserNavigatePanel from "@/feature/user/UserNavigatePanel";
 
 const Navbar = () => {
   const [searchBoxVisibility, setSearchBoxVisibility] = useState(false);
+  const {
+    user: { access_token, profile_img },
+  } = useAuth();
+  const [showUserNavPanel, setShowUserNavPanel] = useState(false);
+
+  const toggleUserNavPanel = () => {
+    setShowUserNavPanel((currentValue) => !currentValue);
+  };
+
+  const toggleSearchBox = () => {
+    setSearchBoxVisibility((currentValue) => !currentValue);
+  };
+
+  const handleBlurUserNavPanel = () => {
+    setTimeout(() => setSearchBoxVisibility(false), 200);
+  };
 
   return (
     <nav className="navbar">
@@ -30,9 +48,7 @@ const Navbar = () => {
       <div className="flex items-center gap-3 md:gap-6 ml-auto">
         <button
           className="md:hidden bg-grey w-12 h-12 rounded-full items-center justify-center"
-          onClick={() =>
-            setSearchBoxVisibility((currentValue) => !currentValue)
-          }
+          onClick={toggleSearchBox}
         >
           <i className="fi fi-rr-search text-xl"></i>
         </button>
@@ -40,12 +56,35 @@ const Navbar = () => {
           <i className="fi fi-rr-file-edit"></i>
           <p>Write</p>
         </Link>
-        <Link to={paths.signin} className="btn-dark py-2">
-          Sign In
-        </Link>
-        <Link to={paths.signup} className="btn-light py-2 hidden md:block">
-          Sign Up
-        </Link>
+        {access_token ? (
+          <>
+            <Link to={paths.notification}>
+              <button className="w-12 h-12 rounded-full bg-grey relative hover:bg-black/10">
+                <i className="fi fi-rr-bell text-2xl block mt-1"></i>
+              </button>
+            </Link>
+            <div className="relative" onBlur={handleBlurUserNavPanel}>
+              <button className="w-12 h-12 mt-1" onClick={toggleUserNavPanel}>
+                <img
+                  src={profile_img}
+                  alt="profile image"
+                  className="w-full h-full object-cover rounded-full"
+                />
+              </button>
+
+              {showUserNavPanel && <UserNavigatePanel />}
+            </div>
+          </>
+        ) : (
+          <>
+            <Link to={paths.signin} className="btn-dark py-2">
+              Sign In
+            </Link>
+            <Link to={paths.signup} className="btn-light py-2 hidden md:block">
+              Sign Up
+            </Link>
+          </>
+        )}
       </div>
     </nav>
   );

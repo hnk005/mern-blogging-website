@@ -2,7 +2,7 @@ import { PropsWithChildren } from "react";
 import { AnimatePresence, motion, MotionProps } from "framer-motion";
 
 interface AnimationWrapperProps extends MotionProps {
-  keyValue: string;
+  keyValue?: string;
   className?: string;
 }
 

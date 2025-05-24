@@ -4,12 +4,12 @@ import "./index.css";
 import { RouterProvider } from "react-router-dom";
 import router from "./routes/router.tsx";
 import { GlobalLoading } from "react-global-loading";
-import { Toaster } from 'react-hot-toast';
+import { Toaster } from "react-hot-toast";
 
 createRoot(document.getElementById("root")!).render(
-  <StrictMode>
+  <>
     <GlobalLoading />
-    <Toaster/>
+    <Toaster />
     <RouterProvider router={router} />
-  </StrictMode>
+  </>
 );

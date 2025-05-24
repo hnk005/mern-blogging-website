@@ -6,6 +6,7 @@ import {
   storeInSesstion,
 } from "@/services/session";
 import { SignInRequest, SignUpRequest } from "@/types/auth.type";
+import { PersionInfoResponse } from "@/types/user.type";
 import { AxiosError } from "axios";
 import { createContext, PropsWithChildren, useContext, useState } from "react";
 import { globalLoading } from "react-global-loading";
@@ -13,12 +14,7 @@ import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 
 interface AuthContextInterface {
-  user: {
-    access_token: "";
-    profile_img: "";
-    fullname: "";
-    username: "";
-  };
+  user: PersionInfoResponse;
   signUp: (data: SignUpRequest) => Promise<void>;
   signIn: (data: SignInRequest) => Promise<void>;
   googleAuth: () => Promise<void>;
@@ -49,8 +45,11 @@ const AuthProvider = ({ children }: PropsWithChildren) => {
       toast.success(res.data?.message);
       navigate("/sign-in");
     } catch (error) {
-      const err = error as AxiosError;
-      toast.error(err?.response?.data?.message || err.message);
+      if (error instanceof AxiosError) {
+        toast.error(error?.response?.data?.message || error.message);
+      } else {
+        console.error(error);
+      }
     } finally {
       hide();
     }
@@ -67,8 +66,11 @@ const AuthProvider = ({ children }: PropsWithChildren) => {
       setUser(res.data);
       navigate("/");
     } catch (error) {
-      const err = error as AxiosError;
-      toast.error(err?.response?.data?.message || err.message);
+      if (error instanceof AxiosError) {
+        toast.error(error?.response?.data?.message || error.message);
+      } else {
+        console.error(error);
+      }
     } finally {
       hide();
     }

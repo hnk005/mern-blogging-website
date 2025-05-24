@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import logo from "@/assets/logo.png";
 import { useState } from "react";
 import clsx from "clsx";
@@ -12,6 +12,7 @@ const Navbar = () => {
     user: { access_token, profile_img },
   } = useAuth();
   const [showUserNavPanel, setShowUserNavPanel] = useState(false);
+  const navigate = useNavigate();
 
   const toggleUserNavPanel = () => {
     setShowUserNavPanel((currentValue) => !currentValue);
@@ -23,6 +24,14 @@ const Navbar = () => {
 
   const handleBlurUserNavPanel = () => {
     setTimeout(() => setShowUserNavPanel(false), 200);
+  };
+
+  const handleSearch = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    const target = e.target as HTMLInputElement;
+    const query = target.value;
+    if (e.keyCode == 13 && query.length) {
+      navigate(`${paths.search}/${query}`);
+    }
   };
 
   return (
@@ -38,6 +47,7 @@ const Navbar = () => {
         )}
       >
         <input
+          onKeyDown={handleSearch}
           type="text"
           placeholder="Search"
           className="w-full md:w-auto bg-grey p-4 pl-6 pr-[12%] md:pr-6 rounded-full placeholder:text-dark-grey md:pl-12"

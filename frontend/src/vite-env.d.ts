@@ -8,6 +8,9 @@ interface ViteTypeOptions {
 interface ImportMetaEnv {
   readonly VITE_APP_TITLE: string;
   readonly VITE_SERVER_DOMAIN: string;
+  readonly VITE_CLOUDINARY_URL: string;
+  readonly VITE_CLOUDINARY_PRESET: string;
+  readonly CLOUDINARY_API_RECRET: string;
 }
 
 interface ImportMeta {

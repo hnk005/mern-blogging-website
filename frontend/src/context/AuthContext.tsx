@@ -90,7 +90,8 @@ const AuthProvider = ({ children }: PropsWithChildren) => {
     try {
       const res = await authWithGoogle();
 
-      const { accessToken } = res.user;
+      // Get Firebase user's ID token
+      const accessToken = await res.user.getIdToken();
 
       if (accessToken) {
         const googleRes = await axiosClient.post(

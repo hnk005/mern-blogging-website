@@ -23,7 +23,7 @@ const HomePage = () => {
   ];
 
   const [pageName, setPageName] = useState("home");
-  const [limit] = useState(2);
+  const [limit] = useState(5);
 
   const {
     data,
@@ -32,7 +32,7 @@ const HomePage = () => {
     isFetchingNextPage,
     isLoading: isLoadingBlogLatest,
     isError: isErrorBlogLatest,
-  } = useBlogsInfiniteQuery({ pageName: pageName, limit: limit });
+  } = useBlogsInfiniteQuery({ tag: pageName, limit: limit });
 
   const blogsLatest = useMemo(
     () => data?.pages.flatMap((page) => page.results) ?? [],

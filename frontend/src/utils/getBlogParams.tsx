@@ -1,19 +1,21 @@
 type HandleParamsInput = {
   pageParam: number | any;
-  pageName: string;
+  tag: string;
   search?: string;
   limit: number;
   author?: string;
+  eliminate_blog?: string;
 };
 
 export const getBlogParams = ({
   pageParam,
-  pageName,
+  tag,
   search,
   limit,
   author,
+  eliminate_blog,
 }: HandleParamsInput) => {
-  switch (pageName) {
+  switch (tag) {
     case "search":
       return { search, page: pageParam, limit };
     case "home":
@@ -21,6 +23,6 @@ export const getBlogParams = ({
     case "userBlogs":
       return { page: pageParam, limit, author };
     default:
-      return { tag: pageName, page: pageParam, limit };
+      return { tag, page: pageParam, limit, eliminate_blog };
   }
 };

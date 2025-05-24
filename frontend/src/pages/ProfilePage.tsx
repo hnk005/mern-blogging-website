@@ -36,7 +36,7 @@ const ProfilePage = () => {
   } = useAuth();
   const [userProfile, setUserProfile] =
     useState<ProfileResponse>(initStateUserProfile);
-  const [limit] = useState(2);
+  const [limit] = useState(5);
 
   const {
     data: profile,
@@ -63,7 +63,7 @@ const ProfilePage = () => {
     isLoading: isLoadingUserBlog,
     isError: isErrorUserBlog,
   } = useBlogsInfiniteQuery({
-    pageName: "userBlogs",
+    tag: "userBlogs",
     limit: limit,
     author: userProfile._id,
   });

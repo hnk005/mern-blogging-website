@@ -6,6 +6,7 @@ import PageLoader from "@/components/loader/PageLoader";
 import ProtectRoutes from "@/components/guards/ProtectRoutes";
 import EditorProvider from "@/context/EditorContext";
 import ProtectRoutesAuth from "@/components/guards/ProtectRoutesAuth";
+import BlogProvider from "@/context/BlogContext";
 
 const App = lazy<() => ReactElement>(() => import("@/App"));
 
@@ -63,7 +64,11 @@ const routes: RouteObject[] = [
           },
           {
             path: paths.blog + "/:blog_id",
-            element: <BlogPage />,
+            element: (
+              <BlogProvider>
+                <BlogPage />
+              </BlogProvider>
+            ),
           },
           {
             element: <ProtectRoutesAuth />,

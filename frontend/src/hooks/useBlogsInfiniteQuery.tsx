@@ -11,15 +11,16 @@ type BlogAPIResponse = {
 };
 
 type Params = {
-  pageName: string;
+  tag: string;
   limit: number;
   search?: string;
   author?: string;
+  eliminate_blog?: string;
 };
 
 export const useBlogsInfiniteQuery = (params: Params) => {
   return useInfiniteQuery<BlogAPIResponse>({
-    queryKey: ["blog", params.pageName, params.search, params.author],
+    queryKey: ["blog", params.tag, params.search, params.author],
     queryFn: async ({ pageParam = 1 }) => {
       const res = await axiosClient.get<BlogAPIResponse>(
         `${import.meta.env.VITE_SERVER_DOMAIN}/blog/latest`,

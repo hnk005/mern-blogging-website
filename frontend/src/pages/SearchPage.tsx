@@ -12,7 +12,7 @@ import { useParams } from "react-router-dom";
 
 const SearchPage = () => {
   const { query } = useParams();
-  const [limit] = useState(2);
+  const [limit] = useState(5);
 
   const {
     data,
@@ -22,7 +22,7 @@ const SearchPage = () => {
     isLoading: isLoadingBlogLatest,
     isError: isErrorBlogLatest,
   } = useBlogsInfiniteQuery({
-    pageName: "search",
+    tag: "search",
     search: query,
     limit: limit,
   });

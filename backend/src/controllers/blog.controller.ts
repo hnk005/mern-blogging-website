@@ -60,25 +60,24 @@ export const getLatestBlog = async (
   res: Response,
   next: NextFunction
 ) => {
-  const { tag, search, author } = req.query;
+  const { tag, search, author, page, limit, eliminate_blog } = req.query;
 
   try {
-    const page = Number(req.query.page) ?? 1;
-    const limit = Number(req.query.limit) ?? 5;
-    const skip = (page - 1) * limit;
+    const pageCurrent = Number(page) ?? 1;
+    const maxlimit = Number(limit) ?? 5;
+    const skip = (pageCurrent - 1) * maxlimit;
 
     const findQuery = {} as { [key: string]: any };
     findQuery.draft = false;
 
-    if (typeof tag === "string") {
+    if (tag) {
       findQuery.tags = tag;
-    }
-
-    if (typeof search === "string") {
+      if (eliminate_blog) {
+        findQuery.blog_id = { $ne: eliminate_blog };
+      }
+    } else if (typeof search == "string") {
       findQuery.title = new RegExp(search, "i");
-    }
-
-    if (typeof author === "string") {
+    } else if (author) {
       findQuery.author = author;
     }
 
@@ -92,11 +91,11 @@ export const getLatestBlog = async (
       .sort({ publishedAt: -1 })
       .select("blog_id title des banner activity tags publishedAt -_id")
       .skip(skip)
-      .limit(limit);
+      .limit(maxlimit);
 
     res.status(StatusCodes.OK).json({
       results: data,
-      page,
+      page: pageCurrent,
       totalDocs,
     });
   } catch (error) {

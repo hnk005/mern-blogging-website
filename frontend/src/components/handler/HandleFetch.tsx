@@ -6,7 +6,7 @@ interface HandleFetchProps extends PropsWithChildren {
   data: any;
   isLoading: boolean;
   isError: boolean;
-  messageNoData: string;
+  messageNoData?: string;
 }
 
 const HandleFetch = ({
@@ -29,13 +29,13 @@ const HandleFetch = ({
       if (data.length > 0) {
         return children;
       } else {
-        return <NoDataMessage message={messageNoData} />;
+        return messageNoData && <NoDataMessage message={messageNoData} />;
       }
     } else {
       return children;
     }
   } else {
-    return <NoDataMessage message={messageNoData} />;
+    return messageNoData && <NoDataMessage message={messageNoData} />;
   }
 };
 

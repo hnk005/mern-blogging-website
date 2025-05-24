@@ -29,7 +29,7 @@ export const getProfile = async (
   res: Response,
   next: NextFunction
 ) => {
-  const { username } = req.query;
+  const { username } = req.params;
 
   try {
     const data = await UserModel.findOne({

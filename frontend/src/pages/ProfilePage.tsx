@@ -46,8 +46,7 @@ const ProfilePage = () => {
     queryKey: ["user/profile", profileId],
     queryFn: async () => {
       const response = await axiosClient.get<{ user: ProfileResponse }>(
-        `${import.meta.env.VITE_SERVER_DOMAIN}/user/profile`,
-        { params: { username: profileId } }
+        `${import.meta.env.VITE_SERVER_DOMAIN}/user/profile/${profileId}`,
       );
       return response.data.user;
     },

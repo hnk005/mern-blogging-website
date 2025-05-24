@@ -1,9 +1,9 @@
-import { BlogResponse } from "@/types/blog.type";
+import { BlogCardResponse } from "@/types/blog.type";
 import { getDay } from "@/utils/formatDate";
 import { Link } from "react-router-dom";
 
 interface MinimalBlogPostInterface {
-  data: BlogResponse;
+  data: BlogCardResponse;
   index: number;
 }
 

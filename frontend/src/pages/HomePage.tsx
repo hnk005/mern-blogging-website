@@ -5,7 +5,7 @@ import BlogCard from "@/feature/blog/BlogCard";
 import MinimalBlogPost from "@/feature/blog/MinimalBlogPost";
 import InpageNaviation from "@/feature/home/InpageNaviation";
 import { useBlogsInfiniteQuery } from "@/hooks/useBlogsInfiniteQuery";
-import { BlogResponse } from "@/types/blog.type";
+import { BlogCardResponse } from "@/types/blog.type";
 import { useQuery } from "@tanstack/react-query";
 import clsx from "clsx";
 import { useMemo, useState } from "react";
@@ -46,7 +46,7 @@ const HomePage = () => {
   } = useQuery({
     queryKey: ["blog/trending"],
     queryFn: async () => {
-      const response = await axiosClient.get<{ blogs: BlogResponse[] }>(
+      const response = await axiosClient.get<{ blogs: BlogCardResponse[] }>(
         `${import.meta.env.VITE_SERVER_DOMAIN}/blog/trending`
       );
       return response.data.blogs;

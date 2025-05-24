@@ -9,4 +9,5 @@ export default {
   signUp: `/sign-up`,
   search: "/search",
   user: "/user",
+  blog: "/blog",
 };

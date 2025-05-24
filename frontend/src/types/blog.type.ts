@@ -22,7 +22,7 @@ export type CreateBlogRequest = {
   draft?: boolean;
 };
 
-export type BlogResponse = {
+export type BlogCardResponse = {
   activity: {
     total_likes: number;
     total_comments: number;
@@ -36,4 +36,8 @@ export type BlogResponse = {
   tags: string[];
   author: UserResponse;
   publishedAt: string;
+};
+
+export type BlogResponse = BlogCardResponse & {
+  content: any;
 };

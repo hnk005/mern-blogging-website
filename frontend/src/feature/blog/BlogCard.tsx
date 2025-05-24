@@ -1,9 +1,9 @@
-import { BlogResponse } from "@/types/blog.type";
+import { BlogCardResponse } from "@/types/blog.type";
 import { getDay } from "@/utils/formatDate";
 import { Link } from "react-router-dom";
 
 interface BlogCardInterface {
-  data: BlogResponse;
+  data: BlogCardResponse;
 }
 
 const BlogCard = ({ data }: BlogCardInterface) => {

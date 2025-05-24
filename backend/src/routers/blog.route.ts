@@ -1,5 +1,6 @@
 import {
   createBlog,
+  getBlogById,
   getLatestBlog,
   getTrendingBlog,
 } from "@/controllers/blog.controller";
@@ -12,6 +13,7 @@ const blogRoute = Router();
 
 blogRoute.get("/latest", getLatestBlog);
 blogRoute.get("/trending", getTrendingBlog);
+blogRoute.get("/:id", getBlogById);
 blogRoute.post(
   "/create",
   authMiddleware,

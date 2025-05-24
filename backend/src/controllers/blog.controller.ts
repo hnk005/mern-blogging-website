@@ -1,5 +1,6 @@
 import BlogModel from "@/models/Blog.model";
 import UserModel from "@/models/User.model";
+import { APIError } from "@/utils/error";
 import { Request, Response, NextFunction } from "express";
 import { StatusCodes } from "http-status-codes";
 import { nanoid } from "nanoid";
@@ -125,6 +126,35 @@ export const getTrendingBlog = async (
       .limit(limit);
 
     res.status(StatusCodes.OK).json({ blogs: data });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getBlogById = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const { id: blog_id } = req.params;
+
+  const incrementVal = 1;
+  try {
+    const data = await BlogModel.findOneAndUpdate(
+      { blog_id },
+      { $inc: { "activity.total_reads": incrementVal } }
+    )
+      .populate(
+        "author",
+        "personal_info.fullname personal_info.username  personal_info.profile_img -_id"
+      )
+      .select("title des content banner activity publishedAt blog_id tags");
+
+    if (!data) {
+      throw new APIError("NOT_FOUND", StatusCodes.NOT_FOUND, "Blog not found");
+    }
+
+    res.status(StatusCodes.OK).json({ blog: data });
   } catch (error) {
     next(error);
   }

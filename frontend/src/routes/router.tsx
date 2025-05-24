@@ -27,6 +27,7 @@ const EditorPage = lazy<() => ReactElement>(() => import("@/pages/EditorPage"));
 const ProfilePage = lazy<() => ReactElement>(
   () => import("@/pages/ProfilePage")
 );
+const BlogPage = lazy<() => ReactElement>(() => import("@/pages/BlogPage"));
 const PageNotFound = lazy<() => ReactElement>(() => import("@/pages/404Page"));
 
 const routes: RouteObject[] = [
@@ -59,6 +60,10 @@ const routes: RouteObject[] = [
           {
             path: paths.user + "/:id",
             element: <ProfilePage />,
+          },
+          {
+            path: paths.blog + "/:blog_id",
+            element: <BlogPage />,
           },
           {
             element: <ProtectRoutesAuth />,

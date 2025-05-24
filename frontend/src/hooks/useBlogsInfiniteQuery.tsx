@@ -1,11 +1,11 @@
 // hooks/useBlogsInfiniteQuery.ts
 import axiosClient from "@/config/axios";
-import { BlogResponse } from "@/types/blog.type";
+import { BlogCardResponse } from "@/types/blog.type";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { getBlogParams } from "@/utils/getBlogParams";
 
 type BlogAPIResponse = {
-  results: BlogResponse[];
+  results: BlogCardResponse[];
   page: number;
   totalDocs: number;
 };

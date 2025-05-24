@@ -1,6 +1,5 @@
 export const rootPaths = {
   homeRoot: "/",
-  // errorRoot: 'error',
 };
 
 export default {
@@ -8,5 +7,6 @@ export default {
   editor: `/editor`,
   signIn: `/sign-in`,
   signUp: `/sign-up`,
-  // 404: `/${rootPaths.errorRoot}/404`,
+  search: "/search",
+  user: "/user",
 };

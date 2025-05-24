@@ -1,10 +1,10 @@
-// src/middlewares/validate.ts
+
 import { APIError } from "@/utils/error";
 import { Request, Response, NextFunction } from "express";
 import { StatusCodes } from "http-status-codes";
 import { ObjectSchema } from "joi";
 
-const validate =
+const validateMiddleware =
   (schema: ObjectSchema) =>
   (req: Request, _: Response, next: NextFunction): void => {
     try {
@@ -25,4 +25,4 @@ const validate =
     }
   };
 
-export default validate;
+export default validateMiddleware;

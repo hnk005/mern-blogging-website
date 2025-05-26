@@ -1,5 +1,6 @@
 import { useAuth } from "@/context/AuthContext";
 import { useBlog } from "@/context/BlogContext";
+import paths from "@/routes/paths";
 import { Link } from "react-router-dom";
 
 const BlogInteraction = () => {
@@ -35,7 +36,7 @@ const BlogInteraction = () => {
         <div className="flex gap-6 items-center">
           {username == author_username && (
             <Link
-              to={`/editor/${blog_id}`}
+              to={`${paths.editor}/${blog_id}`}
               className="underline hover:text-purple"
             >
               Edit

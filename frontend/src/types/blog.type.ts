@@ -22,6 +22,10 @@ export type CreateBlogRequest = {
   draft?: boolean;
 };
 
+export type CreateBlogUpdateRequest = CreateBlogRequest & {
+  blog_id: string;
+};
+
 export type BlogCardResponse = {
   activity: {
     total_likes: number;

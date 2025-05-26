@@ -103,6 +103,10 @@ const routes: RouteObject[] = [
                 path: paths.editor,
                 element: <EditorPage />,
               },
+              {
+                path: paths.editor + "/:blog_id",
+                element: <EditorPage />,
+              },
             ],
           },
         ],

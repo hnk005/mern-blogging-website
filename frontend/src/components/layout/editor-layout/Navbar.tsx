@@ -7,9 +7,11 @@ const Navbar = () => {
   const {
     blog: { banner, title },
     textEditor,
+    mode,
     setEditor,
     setContent,
     publishBlog,
+    updateBlog,
   } = useEditor();
 
   const handlePublish = async () => {
@@ -39,8 +41,29 @@ const Navbar = () => {
     }
   };
 
-  const handleSaveDraft = async () => {
-    await publishBlog(true);
+  const handleSaveDraft = async (e: React.MouseEvent<HTMLButtonElement>) => {
+    const button = e.currentTarget;
+
+    if (button.classList.contains("disable")) {
+      return;
+    }
+
+    button.classList.add("disable");
+
+    try {
+      switch (mode) {
+        case "create":
+          await publishBlog(true);
+          break;
+        case "edit":
+          await updateBlog(true);
+          break;
+        default:
+          break;
+      }
+    } finally {
+      button.classList.remove("disable");
+    }
   };
 
   return (
@@ -53,7 +76,7 @@ const Navbar = () => {
       </p>
       <div className="flex gap-4 ml-auto">
         <button onClick={handlePublish} className="btn-dark py-2">
-          Publish
+          {mode == "create" ? "Publish" : "Update"}
         </button>
         <button onClick={handleSaveDraft} className="btn-light py-2">
           Save Draft

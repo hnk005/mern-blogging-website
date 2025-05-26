@@ -5,6 +5,12 @@ import { Request, Response, NextFunction } from "express";
 import { StatusCodes } from "http-status-codes";
 import { nanoid } from "nanoid";
 
+declare module "express-serve-static-core" {
+  interface Request {
+    user: string;
+  }
+}
+
 export const createBlog = async (
   req: Request,
   res: Response,
@@ -136,24 +142,91 @@ export const getBlogById = async (
   next: NextFunction
 ) => {
   const { id: blog_id } = req.params;
+  const { draft, mode } = req.query;
+  const incrementVal = mode != "edit" ? 1 : 0;
 
-  const incrementVal = 1;
   try {
-    const data = await BlogModel.findOneAndUpdate(
+    const blog = await BlogModel.findOneAndUpdate(
       { blog_id },
-      { $inc: { "activity.total_reads": incrementVal } }
+      { $inc: { "activity.total_reads": incrementVal } },
+      { new: true }
     )
-      .populate(
-        "author",
-        "personal_info.fullname personal_info.username  personal_info.profile_img -_id"
-      )
-      .select("title des content banner activity publishedAt blog_id tags");
+      .populate({
+        path: "author",
+        select:
+          "personal_info.fullname personal_info.username personal_info.profile_img",
+      })
+      .select(
+        "title des content banner activity publishedAt blog_id tags author"
+      );
 
-    if (!data) {
+    if (!blog) {
       throw new APIError("NOT_FOUND", StatusCodes.NOT_FOUND, "Blog not found");
     }
 
-    res.status(StatusCodes.OK).json({ blog: data });
+    const author: any = blog.author;
+    if (!author || !author.personal_info || !author.personal_info.username) {
+      throw new APIError(
+        "NOT_FOUND",
+        StatusCodes.NOT_FOUND,
+        "Author information not found"
+      );
+    }
+
+    if (blog.draft && !draft) {
+      throw new APIError(
+        "BAD_REQUEST",
+        StatusCodes.BAD_REQUEST,
+        "You can not access draft blogs"
+      );
+    }
+
+    await UserModel.findOneAndUpdate(
+      { "personal_info.username": author.personal_info.username },
+      {
+        $inc: { "account_info.total_reads": incrementVal },
+      }
+    );
+
+    res.status(StatusCodes.OK).json({ blog });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const updateBlog = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const authorId = req.user;
+  const { title, banner, content, tags, des, draft, blog_id } = req.body;
+
+  try {
+    const blog = await BlogModel.findOne({ blog_id });
+
+    if (!blog) {
+      throw new APIError("NOT_FOUND", StatusCodes.NOT_FOUND, "Blog not found");
+    }
+
+    if (blog.author.toString() !== authorId.toString()) {
+      throw new APIError(
+        "FORBIDDEN",
+        StatusCodes.FORBIDDEN,
+        "You do not have permission to edit this blog"
+      );
+    }
+
+    blog.title = title;
+    blog.banner = banner;
+    blog.content = content;
+    blog.tags = tags;
+    blog.des = des;
+    blog.draft = draft;
+
+    await blog.save();
+
+    res.status(StatusCodes.OK).json({ message: "Blog updated successfully" });
   } catch (error) {
     next(error);
   }

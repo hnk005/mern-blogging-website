@@ -3,10 +3,10 @@ import { PropsWithChildren } from "react";
 
 const MainLayout = ({ children }: PropsWithChildren) => {
   return (
-    <div>
+    <>
       <Navbar />
-      <main>{children}</main>
-    </div>
+      <main className="h-full w-full">{children}</main>
+    </>
   );
 };
 

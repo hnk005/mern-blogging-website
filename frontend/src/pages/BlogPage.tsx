@@ -6,7 +6,7 @@ import paths from "@/routes/paths";
 import { getDay } from "@/utils/formatDate";
 import BlogInteraction from "@/feature/blog/BlogInteraction";
 import { useBlog } from "@/context/BlogContext";
-import { useEffect, useMemo } from "react";
+import { useLayoutEffect, useMemo } from "react";
 import { useBlogsInfiniteQuery } from "@/hooks/useBlogsInfiniteQuery";
 import HandleFetch from "@/components/handler/HandleFetch";
 import BlogCard from "@/feature/blog/BlogCard";
@@ -42,7 +42,7 @@ const BlogPage = () => {
     [data?.pages]
   );
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (blog_id) setBlogId(blog_id);
   }, [blog_id]);
 
@@ -50,63 +50,65 @@ const BlogPage = () => {
     return <PageNotFound />;
   }
 
-  console.log(content);
-
   return (
     <AnimationWrapper>
-      {isLoadingBlog ? (
-        <DataLoader size={35} />
-      ) : (
-        <div className="max-w-[900px] center py-10 max-lg:px-[5vw]">
-          <img src={banner} alt="" />
-          <div className="mt-12">
-            <h1>{title}</h1>
-            <div className="flex max-sm:flex-col justify-between my-8">
-              <div className="flex gap-5 items-start ">
-                <img
-                  src={profile_img}
-                  alt=""
-                  className="w-12 h-12 rounded-full"
-                />
-                <p className="capitalize">
-                  {fullname} <br /> @
-                  <Link to={`${paths.user}/${author_username}`}>
-                    {author_username}
-                  </Link>
+      <div className="max-w-[900px] center py-10 max-lg:px-[5vw]">
+        {isLoadingBlog ? (
+          <DataLoader size={35} />
+        ) : (
+          <>
+            <img src={banner} alt="" />
+            <div className="mt-12">
+              <h2>{title}</h2>
+              <div className="flex max-sm:flex-col justify-between my-8">
+                <div className="flex gap-5 items-start ">
+                  <img
+                    src={profile_img}
+                    alt=""
+                    className="w-12 h-12 rounded-full"
+                  />
+                  <p className="capitalize">
+                    {fullname} <br /> @
+                    <Link to={`${paths.user}/${author_username}`}>
+                      {author_username}
+                    </Link>
+                  </p>
+                </div>
+                <p className="text-dark-grey opacity-75 max-sm:mt-6 max-sm:ml-12 max-sm:pl-5">
+                  Published on {getDay(publishedAt)}
                 </p>
               </div>
-              <p className="text-dark-grey opacity-75 max-sm:mt-6 max-sm:ml-12 max-sm:pl-5">
-                Published on {getDay(publishedAt)}
-              </p>
             </div>
-          </div>
-          <BlogInteraction />
-          <div className="my-12 font-gelasio blog-page-content">
-            {content[0]?.blocks?.map((block: any, i: number) => (
-              <div key={i} className="my-4 md:my-8">
-                <BlogContent block={block} />
-              </div>
-            ))}
-          </div>
-          <BlogInteraction />
+            <BlogInteraction />
+            <div className="my-12 font-gelasio blog-page-content">
+              {content[0]?.blocks?.map((block: any, i: number) => (
+                <div key={i} className="my-4 md:my-8">
+                  <BlogContent block={block} />
+                </div>
+              ))}
+            </div>
+            <BlogInteraction />
 
-          <HandleFetch
-            data={similarBlogs}
-            isLoading={isLoadingSimilarBlog}
-            isError={isErrorSimilarBlog}
-          >
-            <h1 className="text-2xl mt-14 mb-10 font-medium">Similar Blogs</h1>
-            {similarBlogs.map((blog, i) => (
-              <AnimationWrapper
-                key={i}
-                transition={{ duration: 1, delay: i * 0.1 }}
-              >
-                <BlogCard data={blog} />
-              </AnimationWrapper>
-            ))}
-          </HandleFetch>
-        </div>
-      )}
+            <HandleFetch
+              data={similarBlogs}
+              isLoading={isLoadingSimilarBlog}
+              isError={isErrorSimilarBlog}
+            >
+              <h1 className="text-2xl mt-14 mb-10 font-medium">
+                Similar Blogs
+              </h1>
+              {similarBlogs.map((blog, i) => (
+                <AnimationWrapper
+                  key={i}
+                  transition={{ duration: 1, delay: i * 0.1 }}
+                >
+                  <BlogCard data={blog} />
+                </AnimationWrapper>
+              ))}
+            </HandleFetch>
+          </>
+        )}
+      </div>
     </AnimationWrapper>
   );
 };

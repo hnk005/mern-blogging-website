@@ -3,6 +3,7 @@ import {
   getBlogById,
   getLatestBlog,
   getTrendingBlog,
+  updateBlog,
 } from "@/controllers/blog.controller";
 import authMiddleware from "@/middlewares/auth.middleware";
 import validateMiddleware from "@/middlewares/validate.middleware";
@@ -20,5 +21,5 @@ blogRoute.post(
   validateMiddleware(createBlogSchema),
   createBlog
 );
-
+blogRoute.put("/update", authMiddleware, updateBlog);
 export default blogRoute;

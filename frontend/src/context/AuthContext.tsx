@@ -90,7 +90,6 @@ const AuthProvider = ({ children }: PropsWithChildren) => {
     try {
       const res = await authWithGoogle();
 
-      // Get Firebase user's ID token
       const accessToken = await res.user.getIdToken();
 
       if (accessToken) {

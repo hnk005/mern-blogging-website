@@ -22,7 +22,7 @@ export type CreateBlogRequest = {
   draft?: boolean;
 };
 
-export type CreateBlogUpdateRequest = CreateBlogRequest & {
+export type UpdateBlogRequest = CreateBlogRequest & {
   blog_id: string;
 };
 

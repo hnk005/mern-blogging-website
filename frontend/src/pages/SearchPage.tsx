@@ -12,7 +12,8 @@ import { useParams } from "react-router-dom";
 
 const SearchPage = () => {
   const { query } = useParams();
-  const [limit] = useState(5);
+  const [blogLimit] = useState(5);
+  const [userLimit] = useState(20);
 
   const {
     data,
@@ -21,11 +22,14 @@ const SearchPage = () => {
     isFetchingNextPage,
     isLoading: isLoadingBlogLatest,
     isError: isErrorBlogLatest,
-  } = useBlogsInfiniteQuery({
-    tag: "search",
-    search: query,
-    limit: limit,
-  });
+  } = useBlogsInfiniteQuery(
+    {
+      tag: "search",
+      search: query,
+      limit: blogLimit,
+    },
+    !!query
+  );
 
   const {
     data: users,
@@ -37,15 +41,14 @@ const SearchPage = () => {
       const response = await axiosClient.get<{
         users: UserResponse[];
       }>(`${import.meta.env.VITE_SERVER_DOMAIN}/user/search`, {
-        params: { username: query },
+        params: { username: query, limit: userLimit },
       });
       return response.data.users;
     },
-    retry: 3,
-    retryDelay: (attemptIndex) => Math.min(1000, 1000 * (attemptIndex + 1)),
+    retry: false,
   });
 
-  const blogs = useMemo(
+  const searchBlogs = useMemo(
     () => data?.pages.flatMap((page) => page.results) ?? [],
     [data?.pages]
   );
@@ -58,12 +61,12 @@ const SearchPage = () => {
           defaultHidden="Account Mathed"
         >
           <HandleFetch
-            data={blogs}
+            data={searchBlogs}
             isLoading={isLoadingBlogLatest}
             isError={isErrorBlogLatest}
-            messageNoData="No blogs published"
+            messageNoData="No searchBlogs published"
           >
-            {blogs?.map((blog, i: number) => (
+            {searchBlogs?.map((blog, i: number) => (
               <AnimationWrapper
                 key={i}
                 transition={{ duration: 1, delay: i * 0.1 }}

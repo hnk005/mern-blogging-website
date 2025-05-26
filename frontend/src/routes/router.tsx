@@ -4,7 +4,6 @@ import paths from "./paths";
 import { AuthPageProps } from "@/pages/AuthPage";
 import PageLoader from "@/components/loader/PageLoader";
 import ProtectRoutes from "@/components/guards/ProtectRoutes";
-import EditorProvider from "@/context/EditorContext";
 import ProtectRoutesAuth from "@/components/guards/ProtectRoutesAuth";
 import BlogProvider from "@/context/BlogContext";
 
@@ -64,11 +63,7 @@ const routes: RouteObject[] = [
           },
           {
             path: paths.blog + "/:blog_id",
-            element: (
-              <BlogProvider>
-                <BlogPage />
-              </BlogProvider>
-            ),
+            element: <BlogPage />,
           },
           {
             element: <ProtectRoutesAuth />,
@@ -87,13 +82,11 @@ const routes: RouteObject[] = [
       },
       {
         element: (
-          <EditorProvider>
-            <EditorLayout>
-              <Suspense fallback={<PageLoader />}>
-                <Outlet />
-              </Suspense>
-            </EditorLayout>
-          </EditorProvider>
+          <EditorLayout>
+            <Suspense fallback={<PageLoader />}>
+              <Outlet />
+            </Suspense>
+          </EditorLayout>
         ),
         children: [
           {

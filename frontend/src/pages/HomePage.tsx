@@ -12,6 +12,7 @@ import { useMemo, useState } from "react";
 
 const HomePage = () => {
   const categories = [
+    "home",
     "programming",
     "holywood",
     "film making",
@@ -51,8 +52,7 @@ const HomePage = () => {
       );
       return response.data.blogs;
     },
-    retry: 3,
-    retryDelay: (attemptIndex) => Math.min(1000, 1000 * (attemptIndex + 1)),
+    retry: false,
   });
 
   return (

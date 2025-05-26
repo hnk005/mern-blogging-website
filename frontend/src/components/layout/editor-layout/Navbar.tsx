@@ -7,11 +7,10 @@ const Navbar = () => {
   const {
     blog: { banner, title },
     textEditor,
-    mode,
+    blogIdEdit,
     setEditor,
     setContent,
-    publishBlog,
-    updateBlog,
+    handleSubmit,
   } = useEditor();
 
   const handlePublish = async () => {
@@ -51,16 +50,7 @@ const Navbar = () => {
     button.classList.add("disable");
 
     try {
-      switch (mode) {
-        case "create":
-          await publishBlog(true);
-          break;
-        case "edit":
-          await updateBlog(true);
-          break;
-        default:
-          break;
-      }
+      await handleSubmit(true);
     } finally {
       button.classList.remove("disable");
     }
@@ -76,7 +66,7 @@ const Navbar = () => {
       </p>
       <div className="flex gap-4 ml-auto">
         <button onClick={handlePublish} className="btn-dark py-2">
-          {mode == "create" ? "Publish" : "Update"}
+          {blogIdEdit ? "Update" : "Publish"}
         </button>
         <button onClick={handleSaveDraft} className="btn-light py-2">
           Save Draft

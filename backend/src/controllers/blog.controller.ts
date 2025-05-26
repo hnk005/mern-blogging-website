@@ -157,7 +157,7 @@ export const getBlogById = async (
           "personal_info.fullname personal_info.username personal_info.profile_img",
       })
       .select(
-        "title des content banner activity publishedAt blog_id tags author"
+        "title des content banner activity publishedAt blog_id tags author draft"
       );
 
     if (!blog) {
@@ -173,7 +173,7 @@ export const getBlogById = async (
       );
     }
 
-    if (blog.draft && !draft) {
+    if (blog.draft && draft !== "true") {
       throw new APIError(
         "BAD_REQUEST",
         StatusCodes.BAD_REQUEST,

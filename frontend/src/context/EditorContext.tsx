@@ -1,10 +1,6 @@
 import { createContext, PropsWithChildren, useContext, useState } from "react";
 import EditorJS from "@editorjs/editorjs";
-import {
-  Blog,
-  CreateBlogRequest,
-  CreateBlogUpdateRequest,
-} from "@/types/blog.type";
+import { Blog, CreateBlogRequest, UpdateBlogRequest } from "@/types/blog.type";
 import axiosClient from "@/config/axios";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
@@ -16,40 +12,46 @@ interface EditorContextInterface {
   tagLimit: number;
   characterLimit: number;
   blog: Blog;
+  blogIdEdit: string;
   textEditor: EditorJS | { isReady: boolean };
-  mode: "create" | "edit";
-  setMode: (mode: "create" | "edit") => void;
   setTitle: (title: string) => void;
   setBanner: (banner: string) => void;
   setDes: (des: string) => void;
   setEditorJS: (editor: EditorJS) => void;
   setContent: (content: any) => void;
   setEditor: (section: "editor" | "publish") => void;
-  setBlogIdUpdate: (blogId: string) => void;
   setTag: (tag: string) => void;
   removeTag: (tag: string) => void;
   editTag: (tagIndex: number, newTag: string) => void;
-  publishBlog: (draft: boolean) => Promise<void>;
-  updateBlog: (draft: boolean) => Promise<void>;
+  handleSubmit: (draft: boolean) => Promise<void>;
+}
+
+const initStateEditorBlog: Blog = {
+  title: "",
+  banner: "",
+  content: [],
+  tags: [] as string[],
+  des: "",
+  author: {
+    profile_img: "",
+    fullname: "",
+    username: "",
+  },
+};
+
+interface EditorProviderProps extends PropsWithChildren {
+  initState?: Blog;
+  blogIdEdit?: string;
 }
 
 const EditorContext = createContext({} as EditorContextInterface);
 
-const EditorProvider = ({ children }: PropsWithChildren) => {
-  const [blog, setBlog] = useState<Blog>({
-    title: "",
-    banner: "",
-    content: [],
-    tags: [] as string[],
-    des: "",
-    author: {
-      profile_img: "",
-      fullname: "",
-      username: "",
-    },
-  });
-  const [mode, setMode] = useState<"create" | "edit">("create");
-  const [blogIdUpdate, setBlogIdUpdate] = useState("");
+const EditorProvider = ({
+  children,
+  initState = initStateEditorBlog,
+  blogIdEdit = "",
+}: EditorProviderProps) => {
+  const [blog, setBlog] = useState<Blog>(initState);
 
   const {
     user: { access_token },
@@ -57,8 +59,8 @@ const EditorProvider = ({ children }: PropsWithChildren) => {
 
   const navigate = useNavigate();
 
-  const tagLimit = 10;
-  const characterLimit = 200;
+  const [tagLimit] = useState(10);
+  const [characterLimit] = useState(200);
 
   const [editor, setEditor] = useState("editor");
   const [textEditor, setTextEditor] = useState<EditorJS | { isReady: boolean }>(
@@ -112,86 +114,47 @@ const EditorProvider = ({ children }: PropsWithChildren) => {
     });
   };
 
-  const publishBlog = async (draft: boolean) => {
-    const loading = draft ? "Saving as draft..." : "Publishing...";
+  const handleSubmit = async (draft: boolean) => {
+    const loading = draft
+      ? "Saving as draft..."
+      : blogIdEdit
+      ? "Upading..."
+      : "Publishing...";
     const defaultSuccess = draft
       ? "Draft saved successfully"
+      : blogIdEdit
+      ? "Blog update successfully"
       : "Blog published successfully";
 
     const loadingToast = toast.loading(loading);
 
-    const data: CreateBlogRequest = {
-      title: blog.title,
-      des: blog.des,
-      banner: blog.banner,
-      content: blog.content,
-      tags: blog.tags,
-      draft: draft,
-    };
-
-    try {
-      if (!data.title.length) {
-        throw `Write blog title before ${draft ? "save draft" : "publishing"}`;
-      }
-
-      if (!draft) {
-        if (!data.des.length) {
-          throw `Write a description about your blog withing ${characterLimit} characters to publish`;
-        }
-
-        if (!data.tags.length) {
-          throw "Enter at least 1 tag to help us rank your blog";
-        }
-      }
-
-      const res = await axiosClient.post(
-        import.meta.env.VITE_SERVER_DOMAIN + "/blog/create",
-        data,
-        {
-          headers: {
-            Authorization: `Bearer ${access_token}`,
-          },
-        }
-      );
-      toast.success(res.data?.message || defaultSuccess);
-      navigate(-1);
-    } catch (error) {
-      if (typeof error === "string") {
-        toast.error(error);
-        return;
-      } else if (error instanceof AxiosError) {
-        toast.error(error?.response?.data?.message || error.message);
-      } else {
-        console.error(error);
-      }
-    } finally {
-      toast.dismiss(loadingToast);
+    let data: CreateBlogRequest | UpdateBlogRequest;
+    if (blogIdEdit) {
+      data = {
+        banner: blog.banner,
+        title: blog.title,
+        content: blog.content,
+        des: blog.des,
+        tags: blog.tags,
+        blog_id: blogIdEdit,
+        draft: draft,
+      };
+    } else {
+      data = {
+        banner: blog.banner,
+        title: blog.title,
+        content: blog.content,
+        des: blog.des,
+        tags: blog.tags,
+        draft: draft,
+      };
     }
-  };
-
-  const updateBlog = async (draft: boolean) => {
-    const loading = draft ? "Saving as draft..." : "Updating...";
-    const defaultSuccess = draft
-      ? "Draft saved successfully"
-      : "Blog updating successfully";
-
-    const loadingToast = toast.loading(loading);
-
-    const data: CreateBlogUpdateRequest = {
-      title: blog.title,
-      des: blog.des,
-      banner: blog.banner,
-      content: blog.content,
-      tags: blog.tags,
-      blog_id: blogIdUpdate,
-      draft: draft,
-    };
 
     try {
       if (!data.title.length) {
-        throw "Write blog title before publishing" + draft
-          ? "Save Draft"
-          : "publishing";
+        throw `Write blog title before ${
+          draft ? "save draft" : blogIdEdit ? "upadate" : "publish"
+        }`;
       }
 
       if (!draft) {
@@ -203,17 +166,32 @@ const EditorProvider = ({ children }: PropsWithChildren) => {
           throw "Enter at least 1 tag to help us rank your blog";
         }
       }
-      const res = await axiosClient.put(
-        import.meta.env.VITE_SERVER_DOMAIN + "/blog/update",
-        data,
-        {
-          headers: {
-            Authorization: `Bearer ${access_token}`,
-          },
-        }
-      );
+
+      let res;
+      if (blogIdEdit) {
+        res = await axiosClient.put(
+          `${import.meta.env.VITE_SERVER_DOMAIN}/blog/update`,
+          data,
+          {
+            headers: {
+              Authorization: `Bearer ${access_token}`,
+            },
+          }
+        );
+      } else {
+        res = await axiosClient.post(
+          `${import.meta.env.VITE_SERVER_DOMAIN}/blog/create`,
+          data,
+          {
+            headers: {
+              Authorization: `Bearer ${access_token}`,
+            },
+          }
+        );
+      }
+
       toast.success(res.data?.message || defaultSuccess);
-      navigate(-1);
+      navigate("/");
     } catch (error) {
       if (typeof error === "string") {
         toast.error(error);
@@ -235,21 +213,18 @@ const EditorProvider = ({ children }: PropsWithChildren) => {
         characterLimit,
         editor,
         blog,
+        blogIdEdit,
         textEditor,
-        mode,
-        setMode,
         setEditor,
         setTitle,
         setBanner,
         setDes,
-        setBlogIdUpdate,
         setEditorJS,
         setContent,
         setTag,
         removeTag,
         editTag,
-        publishBlog,
-        updateBlog,
+        handleSubmit,
       }}
     >
       {children}

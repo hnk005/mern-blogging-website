@@ -7,13 +7,12 @@ const PublishForm = () => {
     tagLimit,
     characterLimit,
     blog: { banner, title, des, tags },
-    mode,
+    blogIdEdit,
     setEditor,
     setTitle,
     setDes,
     setTag,
-    publishBlog,
-    updateBlog,
+    handleSubmit,
   } = useEditor();
 
   const handleCloseEvent = () => {
@@ -52,16 +51,7 @@ const PublishForm = () => {
     button.classList.add("disable");
 
     try {
-      switch (mode) {
-        case "create":
-          await publishBlog(false);
-          break;
-        case "edit":
-          await updateBlog(false);
-          break;
-        default:
-          break;
-      }
+      await handleSubmit(false);
     } finally {
       button.classList.remove("disable");
     }
@@ -127,7 +117,7 @@ const PublishForm = () => {
             {tagLimit - tags.length} Tags left
           </p>
           <button onClick={handlePublish} className="btn-dark px-8">
-            {mode == "create" ? "Publish" : "Update"}
+            {blogIdEdit ? "Update" : "Publish"}
           </button>
         </div>
       </section>

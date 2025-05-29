@@ -1,16 +1,16 @@
-import axiosClient from "@/config/axios";
-import { BlogResponse } from "@/types/blog.type";
+import { callGetBlog } from "@/config/axios";
+import { IBlogData } from "@/types/blog.type";
 import { useQuery } from "@tanstack/react-query";
 import { createContext, PropsWithChildren, useContext, useMemo } from "react";
 
 interface BlogContextInterface {
-  blog: BlogResponse;
+  blog: IBlogData;
   blogId: string;
   isLoadingBlog: boolean;
   isErrorBlog: boolean;
 }
 
-const initStateBlog: BlogResponse = {
+export const initStateBlog: IBlogData = {
   activity: {
     total_likes: 0,
     total_comments: 0,
@@ -20,9 +20,8 @@ const initStateBlog: BlogResponse = {
   blog_id: "",
   title: "",
   banner: "",
-  content: [],
-  des: "",
-  tags: [],
+  content: [] as any[],
+  tags: [] as string[],
   author: {
     personal_info: {
       fullname: "",
@@ -30,12 +29,13 @@ const initStateBlog: BlogResponse = {
       profile_img: "",
     },
   },
-  publishedAt: "",
+  draft: false,
+  publishedAt: new Date(),
 };
 
 interface BlogProviderProps extends PropsWithChildren {
   blogId: string;
-  mode?: string;
+  mode?: "edit" | "view";
 }
 
 const BlogContext = createContext({} as BlogContextInterface);
@@ -48,17 +48,14 @@ const BlogProvider = ({ children, blogId, mode }: BlogProviderProps) => {
   } = useQuery({
     queryKey: ["blog", blogId],
     queryFn: async () => {
-      const response = await axiosClient.get<{ blog: BlogResponse }>(
-        `${import.meta.env.VITE_SERVER_DOMAIN}/blog/${blogId}`,
-        mode ? { params: { draft: false, mode } } : { params: { draft: false } }
-      );
-      return response.data.blog;
+      const response = await callGetBlog(blogId, mode ?? "view");
+      return response.data;
     },
     retry: false,
     enabled: !!blogId,
   });
 
-  const blog = useMemo(() => data ?? initStateBlog, [data]);
+  const blog = useMemo(() => data?.data ?? initStateBlog, [data?.data]);
 
   return (
     <BlogContext.Provider value={{ blogId, blog, isLoadingBlog, isErrorBlog }}>

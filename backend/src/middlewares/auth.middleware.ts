@@ -10,7 +10,6 @@ const authMiddleware = async (
 ) => {
   const authHeader = req.headers["authorization"];
   try {
-    // Remove 'Bearer ' from authHeader
     const jwtToken = authHeader && authHeader.split(" ")[1];
     if (!jwtToken) {
       throw new APIError(
@@ -20,23 +19,31 @@ const authMiddleware = async (
       );
     }
 
-    // Verify the token (this is just a placeholder, implement your own logic)
     const decoded = jwt.verify(jwtToken, process.env.SECRET_ACCESS_KEY) as {
       id: string;
     };
 
-    if (!decoded) {
-      throw new APIError(
-        "UNAUTHORIZED",
-        StatusCodes.UNAUTHORIZED,
-        "Invalid token"
-      );
-    }
     req.user = decoded.id;
 
     next();
-  } catch (error) {
-    next(error);
+  } catch (error: any) {
+    if (error.name === "TokenExpiredError") {
+      next(
+        new APIError("UNAUTHORIZED", StatusCodes.UNAUTHORIZED, "Token expired")
+      );
+    } else if (error.name === "JsonWebTokenError") {
+      next(
+        new APIError("UNAUTHORIZED", StatusCodes.UNAUTHORIZED, "Invalid token")
+      );
+    } else {
+      next(
+        new APIError(
+          "INTERNAL_SERVER_ERROR",
+          StatusCodes.INTERNAL_SERVER_ERROR,
+          "Server error"
+        )
+      );
+    }
   }
 };
 

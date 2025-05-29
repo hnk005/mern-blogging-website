@@ -100,9 +100,13 @@ export const getLatestBlog = async (
       .limit(maxlimit);
 
     res.status(StatusCodes.OK).json({
-      results: data,
-      page: pageCurrent,
-      totalDocs,
+      meta: {
+        page: pageCurrent,
+        pageSize: maxlimit,
+        pages: Math.ceil(totalDocs / maxlimit),
+        total: totalDocs,
+      },
+      result: data,
     });
   } catch (error) {
     next(error);
@@ -114,7 +118,7 @@ export const getTrendingBlog = async (
   res: Response,
   next: NextFunction
 ) => {
-  const limit = 10;
+  const top10Treding = 10;
 
   try {
     const data = await BlogModel.find({ draft: false })
@@ -128,9 +132,9 @@ export const getTrendingBlog = async (
         publishedAt: -1,
       })
       .select("blog_id title publishedAt -_id")
-      .limit(limit);
+      .limit(top10Treding);
 
-    res.status(StatusCodes.OK).json({ blogs: data });
+    res.status(StatusCodes.OK).json({ message: "successfully", data });
   } catch (error) {
     next(error);
   }
@@ -188,7 +192,7 @@ export const getBlogById = async (
       }
     );
 
-    res.status(StatusCodes.OK).json({ blog });
+    res.status(StatusCodes.OK).json({ message: "successfully", data: blog });
   } catch (error) {
     next(error);
   }

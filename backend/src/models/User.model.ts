@@ -34,25 +34,25 @@ export interface IUser extends Document {
     fullname: string;
     email: string;
     password?: string;
-    username?: string;
+    username: string;
     bio?: string;
     profile_img?: string;
   };
   social_links: {
-    youtube?: string;
-    instagram?: string;
-    facebook?: string;
-    twitter?: string;
-    github?: string;
-    website?: string;
+    youtube: string;
+    instagram: string;
+    facebook: string;
+    twitter: string;
+    github: string;
+    website: string;
   };
+  blogs: mongoose.Types.ObjectId[];
   account_info: {
     total_posts: number;
     total_reads: number;
   };
   google_auth: boolean;
-  blogs: mongoose.Types.ObjectId[];
-  joinedAt?: Date;
+  joinedAt: Date;
 }
 
 const userSchema = new Schema<IUser>(
@@ -78,11 +78,11 @@ const userSchema = new Schema<IUser>(
         type: String,
         minlength: [3, "Username must be at least 3 letters long"],
         unique: true,
+        required: true,
       },
       bio: {
         type: String,
         maxlength: [200, "Bio should not  be at most more than 200"],
-        default: "",
       },
       profile_img: {
         type: String,
@@ -111,14 +111,14 @@ const userSchema = new Schema<IUser>(
       total_posts: { type: Number, default: 0 },
       total_reads: { type: Number, default: 0 },
     },
-    google_auth: {
-      type: Boolean,
-      default: false,
-    },
     blogs: {
       type: [Schema.Types.ObjectId],
       ref: "blogs",
       default: [],
+    },
+    google_auth: {
+      type: Boolean,
+      default: false,
     },
   },
   {

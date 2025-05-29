@@ -1,9 +1,9 @@
-import { BlogCardResponse } from "@/types/blog.type";
+import { IBlogData } from "@/types/blog.type";
 import { getDay } from "@/utils/formatDate";
 import { Link } from "react-router-dom";
 
 interface MinimalBlogPostInterface {
-  data: BlogCardResponse;
+  data: IBlogData;
   index: number;
 }
 
@@ -12,10 +12,11 @@ const MinimalBlogPost = ({ data, index }: MinimalBlogPostInterface) => {
     title,
     blog_id: id,
     author: {
-      personal_info: { fullname, profile_img, username },
+      personal_info: { fullname, username, profile_img },
     },
-    publishedAt,
   } = data;
+
+  const publishedAt = data.publishedAt ?? "";
 
   return (
     <Link to={`/blog/${id}`} className="flex gap-5 mb-8">

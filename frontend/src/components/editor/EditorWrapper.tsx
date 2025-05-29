@@ -1,9 +1,9 @@
 import EditorProvider from "@/context/EditorContext";
 import { useBlog } from "@/context/BlogContext";
 import PageNotFound from "@/pages/404Page";
-import DataLoader from "@/components/loader/DataLoader";
-import { Blog } from "@/types/blog.type";
+import DataLoader from "@/shared/loader/DataLoader";
 import EditorSwitch from "./EditorSwitch";
+import { IEditBlog } from "@/types/blog.type";
 
 const EditorWrapper = () => {
   const { blog, blogId, isErrorBlog, isLoadingBlog } = useBlog();
@@ -16,13 +16,14 @@ const EditorWrapper = () => {
     return <DataLoader size={35} />;
   }
 
-  const initState: Blog = {
+  const initState: IEditBlog = {
     banner: blog.banner,
     title: blog.title,
     content: blog.content,
-    author: blog.author.personal_info,
+    author: blog.author,
     des: blog.des,
     tags: blog.tags,
+    draft: false,
   };
 
   return (

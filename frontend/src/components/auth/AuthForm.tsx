@@ -1,18 +1,17 @@
-import InputBox from "@/components/ui/InputBox";
+import InputBox from "@/shared/ui/InputBox";
 import { AuthPageProps } from "@/pages/AuthPage";
 import googleIcon from "@/assets/google.png";
 import { Link } from "react-router-dom";
 import paths from "@/routes/paths";
 import { Formik, Form } from "formik";
-import { SignInSchema, SignUpSchema } from "./AuthFormSchema";
+import { SignInSchema, SignUpSchema } from "../../schemas/AuthFormSchema";
 import { useAuth } from "@/context/AuthContext";
-import { SignInRequest, SignUpRequest } from "@/types/auth.type";
 
 const AuthForm = ({ type }: AuthPageProps) => {
   const { signIn, googleAuth, signUp } = useAuth();
   const isSignIn = type === "sign-in";
 
-  const initialValues: SignInRequest | SignUpRequest = isSignIn
+  const initialValues = isSignIn
     ? {
         email: "",
         password: "",
@@ -24,11 +23,20 @@ const AuthForm = ({ type }: AuthPageProps) => {
       };
   const validationSchema = isSignIn ? SignInSchema : SignUpSchema;
 
-  const handleSubmit = async (values: SignInRequest | SignUpRequest) => {
+  const handleSubmit = async (values: {
+    fullname?: string;
+    email?: string;
+    password?: string;
+  }) => {
+    const { fullname, email, password } = values;
     if (isSignIn) {
-      signIn(values as SignInRequest);
+      if (email && password) {
+        signIn(email, password);
+      }
     } else {
-      signUp(values as SignUpRequest);
+      if (fullname && email && password) {
+        signUp(fullname, email, password);
+      }
     }
   };
 

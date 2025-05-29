@@ -1,11 +1,10 @@
-import AnimationWrapper from "@/components/animation/AnimationWrapper";
-import HandleFetch from "@/components/handler/HandleFetch";
-import axiosClient from "@/config/axios";
-import BlogCard from "@/feature/blog/BlogCard";
-import InpageNaviation from "@/feature/home/InpageNaviation";
-import UserCard from "@/feature/user/UserCard";
+import AnimationWrapper from "@/shared/animation/AnimationWrapper";
+import HandleFetch from "@/shared/handler/HandleFetch";
+import { callGetUsers } from "@/config/axios";
+import BlogCard from "@/components/blog/BlogCard";
+import InpageNaviation from "@/components/home/InpageNaviation";
+import UserCard from "@/components/user/UserCard";
 import { useBlogsInfiniteQuery } from "@/hooks/useBlogsInfiniteQuery";
-import { UserResponse } from "@/types/user.type";
 import { useQuery } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
@@ -38,18 +37,18 @@ const SearchPage = () => {
   } = useQuery({
     queryKey: ["user", query],
     queryFn: async () => {
-      const response = await axiosClient.get<{
-        users: UserResponse[];
-      }>(`${import.meta.env.VITE_SERVER_DOMAIN}/user/search`, {
-        params: { username: query, limit: userLimit },
-      });
-      return response.data.users;
+      if (!query) {
+        return;
+      }
+      const response = await callGetUsers(query, userLimit);
+      return response.data.data;
     },
     retry: false,
+    enabled: !!query,
   });
 
   const searchBlogs = useMemo(
-    () => data?.pages.flatMap((page) => page.results) ?? [],
+    () => data?.pages.flatMap((page) => page.result) ?? [],
     [data?.pages]
   );
 

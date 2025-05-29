@@ -3,9 +3,9 @@ import mongoose, { Schema, Document, Model } from "mongoose";
 interface IBlog extends Document {
   blog_id: string;
   title: string;
-  banner?: string;
+  banner: string;
   des?: string;
-  content?: any[];
+  content: any[];
   tags?: string[];
   author: mongoose.Types.ObjectId;
   activity: {
@@ -15,8 +15,8 @@ interface IBlog extends Document {
     total_parent_comments: number;
   };
   comments?: mongoose.Types.ObjectId[];
-  draft?: boolean;
-  publishedAt?: Date;
+  draft: boolean;
+  publishedAt: Date;
 }
 
 const blogSchema = new Schema<IBlog>(
@@ -32,6 +32,7 @@ const blogSchema = new Schema<IBlog>(
     },
     banner: {
       type: String,
+      required: true,
     },
     des: {
       type: String,
@@ -39,6 +40,7 @@ const blogSchema = new Schema<IBlog>(
     },
     content: {
       type: [],
+      required: true,
     },
     tags: {
       type: [String],

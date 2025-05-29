@@ -4,9 +4,7 @@ import paths from "@/routes/paths";
 import { Link } from "react-router-dom";
 
 const BlogInteraction = () => {
-  const {
-    user: { username },
-  } = useAuth();
+  const { user } = useAuth();
 
   const {
     blog: {
@@ -18,6 +16,9 @@ const BlogInteraction = () => {
       },
     },
   } = useBlog();
+
+  const username = user.username ?? "";
+
   return (
     <>
       <hr className="border-grey my-2" />
@@ -34,7 +35,7 @@ const BlogInteraction = () => {
           <p className="text-xl text-dark-grey">{total_comments}</p>
         </div>
         <div className="flex gap-6 items-center">
-          {username == author_username && (
+          {username == author_username && blog_id && (
             <Link
               to={`${paths.editor}/${blog_id}`}
               className="underline hover:text-purple"

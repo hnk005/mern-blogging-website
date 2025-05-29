@@ -20,7 +20,7 @@ export const searchUser = async (
         "personal_info.profile_img personal_info.username personal_info.fullname -_id"
       )
       .limit(maxLimit);
-    res.status(StatusCodes.OK).json({ users: data });
+    res.status(StatusCodes.OK).json({ message: "Successfully", data });
   } catch (error) {
     next(error);
   }
@@ -36,12 +36,12 @@ export const getProfile = async (
   try {
     const data = await UserModel.findOne({
       "personal_info.username": username,
-    }).select("-personal_info.password -google_auth -updateAt -blogs");
+    }).select("-personal_info.password -google_auth -updateAt");
 
     if (!data) {
       throw new APIError("NOT_FOUND", StatusCodes.NOT_FOUND, "User not found");
     }
-    res.status(StatusCodes.OK).json({ user: data });
+    res.status(StatusCodes.OK).json({ message: "Successfully", data });
   } catch (error) {
     next(error);
   }

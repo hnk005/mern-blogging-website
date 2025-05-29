@@ -7,6 +7,7 @@ interface HandleFetchProps extends PropsWithChildren {
   isLoading: boolean;
   isError: boolean;
   messageNoData?: string;
+  refetch?: () => void;
 }
 
 const HandleFetch = ({
@@ -14,6 +15,7 @@ const HandleFetch = ({
   isLoading,
   isError,
   messageNoData,
+  refetch,
   children,
 }: HandleFetchProps) => {
   if (isLoading) {
@@ -22,7 +24,12 @@ const HandleFetch = ({
 
   if (isError) {
     return (
-      <NoDataMessage message="An error occurred while fetching. Please try again later." />
+      <div className="flex flex-col gap-4">
+        <NoDataMessage message="An error occurred while fetching. Please try again later." />
+        <button onClick={refetch} className="tag self-center">
+          <i className="fi fi-rr-refresh"></i> Refetch
+        </button>
+      </div>
     );
   } else if (data != undefined && data != null) {
     if (Array.isArray(data)) {

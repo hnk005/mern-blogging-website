@@ -1,4 +1,4 @@
-import AnimationWrapper from "@/components/animation/AnimationWrapper";
+import AnimationWrapper from "@/shared/animation/AnimationWrapper";
 import { useEditor } from "@/context/EditorContext";
 import Tag from "./Tag";
 
@@ -6,7 +6,7 @@ const PublishForm = () => {
   const {
     tagLimit,
     characterLimit,
-    blog: { banner, title, des, tags },
+    blog,
     blogIdEdit,
     setEditor,
     setTitle,
@@ -14,6 +14,11 @@ const PublishForm = () => {
     setTag,
     handleSubmit,
   } = useEditor();
+
+  const banner = blog.banner ?? "";
+  const title = blog.title;
+  const des = blog.des ?? "";
+  const tags = blog.tags ?? [];
 
   const handleCloseEvent = () => {
     setEditor("editor");

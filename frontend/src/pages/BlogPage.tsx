@@ -1,7 +1,7 @@
 import { useParams } from "react-router-dom";
-import AnimationWrapper from "@/components/animation/AnimationWrapper";
+import AnimationWrapper from "@/shared/animation/AnimationWrapper";
 import BlogProvider from "@/context/BlogContext";
-import BlogWrapper from "@/feature/blog/BlogWrapper";
+import BlogWrapper from "@/components/blog/BlogWrapper";
 
 const BlogPage = () => {
   const { blog_id } = useParams();

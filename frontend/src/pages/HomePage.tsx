@@ -1,59 +1,39 @@
-import AnimationWrapper from "@/components/animation/AnimationWrapper";
-import HandleFetch from "@/components/handler/HandleFetch";
-import axiosClient from "@/config/axios";
-import BlogCard from "@/feature/blog/BlogCard";
-import MinimalBlogPost from "@/feature/blog/MinimalBlogPost";
-import InpageNaviation from "@/feature/home/InpageNaviation";
-import { useBlogsInfiniteQuery } from "@/hooks/useBlogsInfiniteQuery";
-import { BlogCardResponse } from "@/types/blog.type";
-import { useQuery } from "@tanstack/react-query";
+import AnimationWrapper from "@/shared/animation/AnimationWrapper";
+import HandleFetch from "@/shared/handler/HandleFetch";
+import BlogCard from "@/components/blog/BlogCard";
+import MinimalBlogPost from "@/components/blog/MinimalBlogPost";
+import InpageNaviation from "@/components/home/InpageNaviation";
 import clsx from "clsx";
 import { useMemo, useState } from "react";
+import useDataHome from "@/hooks/useDataHome";
 
 const HomePage = () => {
-  const categories = [
-    "home",
-    "programming",
-    "holywood",
-    "film making",
-    "social media",
-    "cooking",
-    "tech",
-    "finances",
-    "travel",
-  ];
-
   const [pageName, setPageName] = useState("home");
-  const [limit] = useState(5);
+  const [blogsLatestLimit] = useState(5);
 
   const {
-    data,
-    fetchNextPage,
-    hasNextPage,
-    isFetchingNextPage,
-    isLoading: isLoadingBlogLatest,
-    isError: isErrorBlogLatest,
-  } = useBlogsInfiniteQuery({ tag: pageName, limit: limit });
+    categories,
+    blogsLatest: {
+      data: blogsLatestData,
+      isLoading: isLoadingBlogLatest,
+      isError: isErrorBlogLatest,
+      hasNextPage,
+      fetchNextPage,
+      isFetchingNextPage,
+      refetch: refetchBlogsLatest,
+    },
+    blogsTrending: {
+      data: blogsTrendingData,
+      isLoading: isLoadingBlogTrending,
+      isError: isErrorBlogTrending,
+      refetch: refetchBlogsTreding,
+    },
+  } = useDataHome({ pageName, blogLatestLimit: blogsLatestLimit });
 
   const blogsLatest = useMemo(
-    () => data?.pages.flatMap((page) => page.results) ?? [],
-    [data?.pages]
+    () => blogsLatestData?.pages.flatMap((page) => page.result) ?? [],
+    [blogsLatestData?.pages]
   );
-
-  const {
-    data: blogsTrending,
-    isLoading: isLoadingBlogTrending,
-    isError: isErrorBlogTrending,
-  } = useQuery({
-    queryKey: ["blog/trending"],
-    queryFn: async () => {
-      const response = await axiosClient.get<{ blogs: BlogCardResponse[] }>(
-        `${import.meta.env.VITE_SERVER_DOMAIN}/blog/trending`
-      );
-      return response.data.blogs;
-    },
-    retry: false,
-  });
 
   return (
     <AnimationWrapper>
@@ -68,6 +48,7 @@ const HomePage = () => {
               data={blogsLatest}
               isLoading={isLoadingBlogLatest}
               isError={isErrorBlogLatest}
+              refetch={refetchBlogsLatest}
               messageNoData="No blogs published"
             >
               {blogsLatest?.map((blog, i: number) => (
@@ -90,12 +71,13 @@ const HomePage = () => {
             </HandleFetch>
 
             <HandleFetch
-              data={blogsTrending ?? []}
+              data={blogsTrendingData}
               isLoading={isLoadingBlogTrending}
               isError={isErrorBlogTrending}
+              refetch={refetchBlogsTreding}
               messageNoData="No blogs trending"
             >
-              {blogsTrending?.map((blog, i: number) => (
+              {blogsTrendingData?.map((blog, i: number) => (
                 <AnimationWrapper
                   key={i}
                   transition={{ duration: 1, delay: i * 0.1 }}
@@ -134,12 +116,13 @@ const HomePage = () => {
                 Trending <i className="fi fi-rr-arrow-trend-up"></i>
               </h1>
               <HandleFetch
-                data={blogsTrending ?? []}
+                data={blogsTrendingData}
                 isLoading={isLoadingBlogTrending}
                 isError={isErrorBlogTrending}
+                refetch={refetchBlogsTreding}
                 messageNoData="No blogs trending"
               >
-                {blogsTrending?.map((blog, i: number) => (
+                {blogsTrendingData?.map((blog, i: number) => (
                   <AnimationWrapper
                     key={i}
                     transition={{ duration: 1, delay: i * 0.1 }}

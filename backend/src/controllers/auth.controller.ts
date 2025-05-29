@@ -88,7 +88,9 @@ export const signin = async (
       }
     }
 
-    res.status(StatusCodes.OK).json(formatDataToSend(user));
+    res
+      .status(StatusCodes.OK)
+      .json({ message: "Login successfully", data: formatDataToSend(user) });
   } catch (error) {
     next(error);
   }
@@ -129,7 +131,9 @@ export const googleAuth = async (
         );
       }
 
-      res.status(StatusCodes.OK).json(formatDataToSend(user));
+      res
+        .status(StatusCodes.OK)
+        .json({ message: "Login successfully", data: formatDataToSend(user) });
       return;
     }
 

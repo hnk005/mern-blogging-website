@@ -8,7 +8,7 @@ interface AboutUserProps {
   social_links: {
     [key: string]: string;
   };
-  joinedAt: string;
+  joinedAt: Date;
 }
 
 const AboutUser = ({

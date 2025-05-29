@@ -1,17 +1,16 @@
 import { createContext, PropsWithChildren, useContext, useState } from "react";
 import EditorJS from "@editorjs/editorjs";
-import { Blog, CreateBlogRequest, UpdateBlogRequest } from "@/types/blog.type";
-import axiosClient from "@/config/axios";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 import { AxiosError } from "axios";
-import { useAuth } from "./AuthContext";
+import { IEditBlog, IEditBlogData } from "@/types/blog.type";
+import { callCreateBlog, callUpdateBlog } from "@/config/axios";
 
 interface EditorContextInterface {
   editor: string;
   tagLimit: number;
   characterLimit: number;
-  blog: Blog;
+  blog: IEditBlog;
   blogIdEdit: string;
   textEditor: EditorJS | { isReady: boolean };
   setTitle: (title: string) => void;
@@ -26,21 +25,24 @@ interface EditorContextInterface {
   handleSubmit: (draft: boolean) => Promise<void>;
 }
 
-const initStateEditorBlog: Blog = {
+const initStateEditorBlog: IEditBlog = {
   title: "",
   banner: "",
   content: [],
   tags: [] as string[],
   des: "",
   author: {
-    profile_img: "",
-    fullname: "",
-    username: "",
+    personal_info: {
+      profile_img: "",
+      fullname: "",
+      username: "",
+    },
   },
+  draft: false,
 };
 
 interface EditorProviderProps extends PropsWithChildren {
-  initState?: Blog;
+  initState?: IEditBlog;
   blogIdEdit?: string;
 }
 
@@ -51,11 +53,7 @@ const EditorProvider = ({
   initState = initStateEditorBlog,
   blogIdEdit = "",
 }: EditorProviderProps) => {
-  const [blog, setBlog] = useState<Blog>(initState);
-
-  const {
-    user: { access_token },
-  } = useAuth();
+  const [blog, setBlog] = useState<IEditBlog>(initState);
 
   const navigate = useNavigate();
 
@@ -89,10 +87,10 @@ const EditorProvider = ({
 
   const setTag = (tag: string) => {
     const { tags } = blog;
-    if (tags.length < tagLimit) {
+    if (tags && tags.length < tagLimit) {
       if (!tags.includes(tag) && tag.length) {
         setBlog((currentValue) => {
-          const newTags = [...currentValue.tags, tag];
+          const newTags = [...tags, tag];
           return { ...currentValue, tags: newTags };
         });
       }
@@ -101,14 +99,14 @@ const EditorProvider = ({
 
   const removeTag = (tag: string) => {
     setBlog((currentValue) => {
-      const tags = currentValue.tags.filter((t) => t !== tag);
+      const tags = currentValue.tags?.filter((t) => t !== tag);
       return { ...currentValue, tags };
     });
   };
 
   const editTag = (tagIndex: number, newTag: string) => {
     setBlog((currentValue) => {
-      const tags = [...currentValue.tags];
+      const tags = [...(currentValue.tags ?? [])];
       tags[tagIndex] = newTag;
       return { ...currentValue, tags };
     });
@@ -128,7 +126,7 @@ const EditorProvider = ({
 
     const loadingToast = toast.loading(loading);
 
-    let data: CreateBlogRequest | UpdateBlogRequest;
+    let data: IEditBlogData;
     if (blogIdEdit) {
       data = {
         banner: blog.banner,
@@ -158,36 +156,20 @@ const EditorProvider = ({
       }
 
       if (!draft) {
-        if (!data.des.length) {
+        if (!data.des?.length) {
           throw `Write a description about your blog withing ${characterLimit} characters to publish`;
         }
 
-        if (!data.tags.length) {
+        if (!data.tags?.length) {
           throw "Enter at least 1 tag to help us rank your blog";
         }
       }
 
       let res;
       if (blogIdEdit) {
-        res = await axiosClient.put(
-          `${import.meta.env.VITE_SERVER_DOMAIN}/blog/update`,
-          data,
-          {
-            headers: {
-              Authorization: `Bearer ${access_token}`,
-            },
-          }
-        );
+        res = await callUpdateBlog(data);
       } else {
-        res = await axiosClient.post(
-          `${import.meta.env.VITE_SERVER_DOMAIN}/blog/create`,
-          data,
-          {
-            headers: {
-              Authorization: `Bearer ${access_token}`,
-            },
-          }
-        );
+        res = await callCreateBlog(data);
       }
 
       toast.success(res.data?.message || defaultSuccess);

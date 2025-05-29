@@ -3,10 +3,10 @@ import { useAuth } from "@/context/AuthContext";
 import paths from "@/routes/paths";
 
 const ProtectRoutes = () => {
-  const { user } = useAuth();
+  const { isAuth } = useAuth();
   const location = useLocation();
 
-  if (!user.access_token) {
+  if (!isAuth()) {
     return <Navigate to={paths.signIn} state={{ from: location }} replace />;
   }
 

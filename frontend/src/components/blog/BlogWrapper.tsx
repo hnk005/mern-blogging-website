@@ -1,14 +1,14 @@
 import { Link } from "react-router-dom";
 import BlogContent from "./BlogContent";
 import BlogInteraction from "./BlogInteraction";
-import HandleFetch from "@/components/handler/HandleFetch";
-import AnimationWrapper from "@/components/animation/AnimationWrapper";
+import HandleFetch from "@/shared/handler/HandleFetch";
+import AnimationWrapper from "@/shared/animation/AnimationWrapper";
 import BlogCard from "./BlogCard";
 import { useBlog } from "@/context/BlogContext";
 import { useBlogsInfiniteQuery } from "@/hooks/useBlogsInfiniteQuery";
 import { useMemo, useState } from "react";
 import PageNotFound from "@/pages/404Page";
-import DataLoader from "@/components/loader/DataLoader";
+import DataLoader from "@/shared/loader/DataLoader";
 import paths from "@/routes/paths";
 import { getDay } from "@/utils/formatDate";
 
@@ -32,15 +32,17 @@ const BlogWrapper = () => {
     isLoading: isLoadingSimilarBlog,
     isError: isErrorSimilarBlog,
   } = useBlogsInfiniteQuery({
-    tag: tags[0],
+    tag: tags ? tags[0] : "",
     limit: limitSimilarBlog,
     eliminateBlog: blogId,
   });
 
   const similarBlogs = useMemo(
-    () => data?.pages.flatMap((page) => page.results) ?? [],
+    () => data?.pages.flatMap((page) => page.result) ?? [],
     [data?.pages]
   );
+
+  console.log(blog);
 
   if (isErrorBlog) {
     return <PageNotFound />;

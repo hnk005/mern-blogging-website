@@ -1,32 +1,22 @@
-export type PersionInfoResponse = {
+import { IUser } from "./backend.type";
+
+export interface IUserPersonalInfo
+  extends Pick<
+    IUser["personal_info"],
+    "fullname" | "username" | "profile_img"
+  > {}
+
+export interface IAccount {
   access_token: string;
-  profile_img: string;
-  fullname: string;
-  username: string;
-};
+  user: IUserPersonalInfo;
+}
 
-export type UserResponse = {
-  personal_info: {
-    profile_img: string;
-    fullname: string;
-    username: string;
+export interface IProfile extends Omit<IUser, "google_auth" | "personal_info"> {
+  personal_info: IUserPersonalInfo & {
+    bio?: string;
   };
-};
+}
 
-export type ProfileResponse = {
-  _id: string;
-  personal_info: {
-    fullname: string;
-    username: string;
-    profile_img: string;
-    bio: string;
-  };
-  account_info: {
-    total_posts: number;
-    total_reads: number;
-  };
-  social_links: {
-    [key: string]: string;
-  };
-  joinedAt: string;
-};
+export interface IUsers {
+  personal_info: IUserPersonalInfo;
+}

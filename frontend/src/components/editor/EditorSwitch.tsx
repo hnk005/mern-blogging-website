@@ -1,4 +1,4 @@
-import Navbar from "@/components/layout/editor-layout/Navbar";
+import Navbar from "@/shared/layout/editor-layout/Navbar";
 import { useEditor } from "@/context/EditorContext";
 import EditorBlog from "./EditorBlog";
 import PublishForm from "./PublishForm";

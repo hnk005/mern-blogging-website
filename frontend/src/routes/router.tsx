@@ -2,9 +2,9 @@ import { lazy, Suspense, ReactElement, PropsWithChildren } from "react";
 import { Outlet, RouteObject, createBrowserRouter } from "react-router-dom";
 import paths from "./paths";
 import { AuthPageProps } from "@/pages/AuthPage";
-import PageLoader from "@/components/loader/PageLoader";
-import ProtectRoutes from "@/components/guards/ProtectRoutes";
-import ProtectRoutesAuth from "@/components/guards/ProtectRoutesAuth";
+import PageLoader from "@/shared/loader/PageLoader";
+import ProtectRoutes from "@/shared/guards/ProtectRoutes";
+import ProtectRoutesAuth from "@/shared/guards/ProtectRoutesAuth";
 import BlogProvider from "@/context/BlogContext";
 
 const App = lazy<() => ReactElement>(() => import("@/App"));

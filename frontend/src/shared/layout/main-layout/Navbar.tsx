@@ -4,12 +4,13 @@ import { useState } from "react";
 import clsx from "clsx";
 import paths from "@/routes/paths";
 import { useAuth } from "@/context/AuthContext";
-import UserNavigatePanel from "@/feature/user/UserNavigatePanel";
+import UserNavigatePanel from "@/components/user/UserNavigatePanel";
 
 const Navbar = () => {
   const [searchBoxVisibility, setSearchBoxVisibility] = useState(false);
   const {
-    user: { access_token, profile_img },
+    user: { profile_img },
+    isAuth,
   } = useAuth();
   const [showUserNavPanel, setShowUserNavPanel] = useState(false);
   const navigate = useNavigate();
@@ -66,7 +67,7 @@ const Navbar = () => {
           <i className="fi fi-rr-file-edit"></i>
           <p>Write</p>
         </Link>
-        {access_token ? (
+        {isAuth() ? (
           <>
             <Link to="/dashboard/notification">
               <button className="w-12 h-12 rounded-full bg-grey relative hover:bg-black/10">

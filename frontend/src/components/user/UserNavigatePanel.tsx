@@ -1,4 +1,4 @@
-import AnimationWrapper from "@/components/animation/AnimationWrapper";
+import AnimationWrapper from "@/shared/animation/AnimationWrapper";
 import { useAuth } from "@/context/AuthContext";
 import paths from "@/routes/paths";
 import { Link } from "react-router-dom";

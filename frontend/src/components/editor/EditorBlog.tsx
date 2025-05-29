@@ -1,4 +1,4 @@
-import AnimationWrapper from "@/components/animation/AnimationWrapper";
+import AnimationWrapper from "@/shared/animation/AnimationWrapper";
 import defaultBanner from "@/assets/blog banner.png";
 import React, { useEffect } from "react";
 import toast from "react-hot-toast";

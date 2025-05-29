@@ -23,8 +23,10 @@ export const formatDataToSend = (user: IUser) => {
   );
   return {
     access_token,
-    profile_img: user.personal_info.profile_img,
-    username: user.personal_info.username,
-    fullname: user.personal_info.fullname,
+    user: {
+      profile_img: user.personal_info.profile_img,
+      username: user.personal_info.username,
+      fullname: user.personal_info.fullname,
+    },
   };
 };

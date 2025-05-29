@@ -1,5 +1,5 @@
-import AnimationWrapper from "@/components/animation/AnimationWrapper";
-import AuthForm from "@/feature/auth/AuthForm";
+import AnimationWrapper from "@/shared/animation/AnimationWrapper";
+import AuthForm from "@/components/auth/AuthForm";
 
 export type AuthPageProps = {
   type: "sign-in" | "sign-up";

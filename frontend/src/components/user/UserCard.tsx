@@ -1,8 +1,8 @@
 import paths from "@/routes/paths";
-import { UserResponse } from "@/types/user.type";
+import { IUsers } from "@/types/user.type";
 import { Link } from "react-router-dom";
 
-const UserCard = ({ user }: { user: UserResponse }) => {
+const UserCard = ({ user }: { user: IUsers }) => {
   const {
     personal_info: { fullname, username, profile_img },
   } = user;

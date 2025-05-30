@@ -1,40 +1,28 @@
-// hooks/useBlogsInfiniteQuery.ts
-import axiosClient from "@/config/axios";
-import { BlogResponse } from "@/types/blog.type";
+import { callGetBlogs } from "@/config/axios";
+import { IModelPaginate } from "@/types/backend.type";
+import { IBlogParams } from "@/types/blog.type";
+import { IBlogData } from "@/types/blog.type";
 import { useInfiniteQuery } from "@tanstack/react-query";
-import { getBlogParams } from "@/utils/getBlogParams";
 
-type BlogAPIResponse = {
-  results: BlogResponse[];
-  page: number;
-  totalDocs: number;
-};
-
-type Params = {
-  pageName: string;
-  limit: number;
-  search?: string;
-  author?: string;
-};
-
-export const useBlogsInfiniteQuery = (params: Params) => {
-  return useInfiniteQuery<BlogAPIResponse>({
-    queryKey: ["blog", params.pageName, params.search, params.author],
-    queryFn: async ({ pageParam = 1 }) => {
-      const res = await axiosClient.get<BlogAPIResponse>(
-        `${import.meta.env.VITE_SERVER_DOMAIN}/blog/latest`,
-        {
-          params: getBlogParams({ pageParam, ...params }),
-        }
-      );
+export const useBlogsInfiniteQuery = (
+  params: IBlogParams,
+  enabled: boolean = true,
+  initPage: number = 1
+) => {
+  return useInfiniteQuery<IModelPaginate<IBlogData>>({
+    queryKey: ["blog", params.tag, params.search ?? "", params.author ?? ""],
+    queryFn: async ({ pageParam = initPage }) => {
+      const res = await callGetBlogs(pageParam, params);
       return res.data;
     },
     getNextPageParam: (lastPage, allPages) => {
-      const totalLoaded = allPages.flatMap((p) => p.results).length;
-      return totalLoaded < lastPage.totalDocs ? lastPage.page + 1 : undefined;
+      const totalLoaded = allPages.flatMap((p) => p.result).length;
+      return totalLoaded < lastPage.meta?.total
+        ? lastPage.meta?.page + 1
+        : undefined;
     },
-    initialPageParam: 1,
-    retry: 3,
-    retryDelay: (attemptIndex) => Math.min(1000, 1000 * (attemptIndex + 1)),
+    enabled: enabled,
+    initialPageParam: initPage,
+    retry: false,
   });
 };

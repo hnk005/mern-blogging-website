@@ -1,32 +1,38 @@
-import AnimationWrapper from "@/components/animation/AnimationWrapper";
-import DataLoader from "@/components/loader/DataLoader";
-import axiosClient from "@/config/axios";
+import AnimationWrapper from "@/shared/animation/AnimationWrapper";
+import DataLoader from "@/shared/loader/DataLoader";
 import { useAuth } from "@/context/AuthContext";
-import { ProfileResponse } from "@/types/user.type";
 import { useQuery } from "@tanstack/react-query";
 import { Link, useParams } from "react-router-dom";
 import PageNotFound from "./404Page";
-import AboutUser from "@/feature/user/AboutUser";
+import AboutUser from "@/components/user/AboutUser";
 import { useBlogsInfiniteQuery } from "@/hooks/useBlogsInfiniteQuery";
-import { useEffect, useMemo, useState } from "react";
-import InpageNaviation from "@/feature/home/InpageNaviation";
-import HandleFetch from "@/components/handler/HandleFetch";
-import BlogCard from "@/feature/blog/BlogCard";
+import { useMemo, useState } from "react";
+import InpageNaviation from "@/components/home/InpageNaviation";
+import HandleFetch from "@/shared/handler/HandleFetch";
+import BlogCard from "@/components/blog/BlogCard";
+import { IProfile } from "@/types/user.type";
+import { callGetProfileUser } from "@/config/axios";
 
-const initStateUserProfile = {
+const initStateUserProfile: IProfile = {
   _id: "",
   personal_info: {
     fullname: "",
     username: "",
     profile_img: "",
-    bio: "",
   },
   account_info: {
     total_posts: 0,
     total_reads: 0,
   },
-  social_links: {},
-  joinedAt: "",
+  social_links: {
+    youtube: "",
+    instagram: "",
+    facebook: "",
+    twitter: "",
+    github: "",
+    website: "",
+  },
+  joinedAt: new Date(),
 };
 
 const ProfilePage = () => {
@@ -34,9 +40,8 @@ const ProfilePage = () => {
   const {
     user: { username },
   } = useAuth();
-  const [userProfile, setUserProfile] =
-    useState<ProfileResponse>(initStateUserProfile);
-  const [limit] = useState(2);
+
+  const [userBloglimit] = useState(5);
 
   const {
     data: profile,
@@ -45,15 +50,22 @@ const ProfilePage = () => {
   } = useQuery({
     queryKey: ["user/profile", profileId],
     queryFn: async () => {
-      const response = await axiosClient.get<{ user: ProfileResponse }>(
-        `${import.meta.env.VITE_SERVER_DOMAIN}/user/profile`,
-        { params: { username: profileId } }
-      );
-      return response.data.user;
+      if (!profileId) {
+        return;
+      }
+      const response = await callGetProfileUser(profileId);
+      return response.data.data;
     },
-    retry: 3,
-    retryDelay: (attemptIndex) => Math.min(1000, 1000 * (attemptIndex + 1)),
+    retry: false,
   });
+
+  const {
+    _id,
+    personal_info: { fullname, username: profile_username, profile_img, bio },
+    account_info: { total_posts, total_reads },
+    social_links,
+    joinedAt,
+  } = useMemo(() => profile ?? initStateUserProfile, [profile]);
 
   const {
     data,
@@ -62,37 +74,29 @@ const ProfilePage = () => {
     isFetchingNextPage,
     isLoading: isLoadingUserBlog,
     isError: isErrorUserBlog,
-  } = useBlogsInfiniteQuery({
-    pageName: "userBlogs",
-    limit: limit,
-    author: userProfile._id,
-  });
-
-  const userBlogs = useMemo(
-    () => data?.pages.flatMap((page) => page.results) ?? [],
-    [data?.pages]
+  } = useBlogsInfiniteQuery(
+    {
+      tag: "profile",
+      limit: userBloglimit,
+      author: _id,
+    },
+    !!_id
   );
 
-  useEffect(() => {
-    if (profile) setUserProfile(profile);
-  }, [profile]);
+  const userBlogs = useMemo(
+    () => data?.pages.flatMap((page) => page.result) ?? [],
+    [data?.pages]
+  );
 
   if (isErrorUserProfile) {
     return <PageNotFound />;
   }
 
-  const {
-    personal_info: { fullname, username: profile_username, profile_img, bio },
-    account_info: { total_posts, total_reads },
-    social_links,
-    joinedAt,
-  } = userProfile;
-
   return (
     <AnimationWrapper>
       <section className="h-cover md:flex flex-row-reverse items-start gap-5 min-[1100px]:gap-12">
         <div className="flex flex-col max-md:items-center gap-5 min-w-[250px]">
-          {isLoadingUserProfile || !profile ? (
+          {isLoadingUserProfile ? (
             <DataLoader size={35} />
           ) : (
             <>
@@ -119,7 +123,7 @@ const ProfilePage = () => {
               </div>
               <AboutUser
                 className="max-md:hidden"
-                bio={bio}
+                bio={bio ?? ""}
                 social_links={social_links}
                 joinedAt={joinedAt}
               />
@@ -135,7 +139,7 @@ const ProfilePage = () => {
             <HandleFetch
               data={userBlogs}
               isError={isErrorUserBlog}
-              isLoading={isLoadingUserBlog}
+              isLoading={isLoadingUserBlog || !profile}
               messageNoData="No blogs published"
             >
               {userBlogs.map((blog, i: number) => (
@@ -161,7 +165,7 @@ const ProfilePage = () => {
               <DataLoader size={35} />
             ) : (
               <AboutUser
-                bio={bio}
+                bio={bio ?? ""}
                 social_links={social_links}
                 joinedAt={joinedAt}
               />

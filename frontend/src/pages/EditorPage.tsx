@@ -1,18 +1,23 @@
-import Navbar from "@/components/layout/editor-layout/Navbar";
-import { useEditor } from "@/context/EditorContext";
-import BlogEditor from "@/feature/editor/BlogEditor";
-import PublishForm from "@/feature/editor/PublishForm";
+import BlogProvider from "@/context/BlogContext";
+import EditorProvider from "@/context/EditorContext";
+import EditorSwitch from "@/components/editor/EditorSwitch";
+import EditorWrapper from "@/components/editor/EditorWrapper";
+import { useParams } from "react-router-dom";
 
 const EditorPage = () => {
-  const { editor } = useEditor();
+  const { blog_id } = useParams();
 
-  return editor == "editor" ? (
-    <>
-      <Navbar />
-      <BlogEditor />
-    </>
-  ) : (
-    <PublishForm />
+  if (blog_id) {
+    return (
+      <BlogProvider blogId={blog_id} mode="edit">
+        <EditorWrapper />
+      </BlogProvider>
+    );
+  }
+  return (
+    <EditorProvider>
+      <EditorSwitch />
+    </EditorProvider>
   );
 };
 

@@ -1,12 +1,12 @@
-import Navbar from "@/components/layout/main-layout/Navbar";
+import Navbar from "@/shared/layout/main-layout/Navbar";
 import { PropsWithChildren } from "react";
 
 const MainLayout = ({ children }: PropsWithChildren) => {
   return (
-    <div>
+    <>
       <Navbar />
-      <main>{children}</main>
-    </div>
+      <main className="h-full w-full">{children}</main>
+    </>
   );
 };
 

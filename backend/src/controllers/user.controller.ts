@@ -8,7 +8,9 @@ export const searchUser = async (
   res: Response,
   next: NextFunction
 ) => {
-  const { username } = req.query;
+  const { username, limit } = req.query;
+
+  const maxLimit = limit ? Number(limit) : 50;
 
   try {
     const data = await UserModel.find({
@@ -17,8 +19,8 @@ export const searchUser = async (
       .select(
         "personal_info.profile_img personal_info.username personal_info.fullname -_id"
       )
-      .limit(50);
-    res.status(200).json({ users: data });
+      .limit(maxLimit);
+    res.status(StatusCodes.OK).json({ message: "Successfully", data });
   } catch (error) {
     next(error);
   }
@@ -29,17 +31,17 @@ export const getProfile = async (
   res: Response,
   next: NextFunction
 ) => {
-  const { username } = req.query;
+  const { username } = req.params;
 
   try {
     const data = await UserModel.findOne({
       "personal_info.username": username,
-    }).select("-personal_info.password -google_auth -updateAt -blogs");
+    }).select("-personal_info.password -google_auth -updateAt");
 
     if (!data) {
       throw new APIError("NOT_FOUND", StatusCodes.NOT_FOUND, "User not found");
     }
-    res.status(200).json({ user: data });
+    res.status(StatusCodes.OK).json({ message: "Successfully", data });
   } catch (error) {
     next(error);
   }

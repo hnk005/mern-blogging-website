@@ -28,7 +28,7 @@ export class APIError extends BaseError {
   constructor(
     name = "",
     httpCode = StatusCodes.INTERNAL_SERVER_ERROR,
-    description = "Lỗi máy chủ nội bộ",
+    description = "Internal server error",
     cause: string[] = [],
     isOperational = true
   ) {

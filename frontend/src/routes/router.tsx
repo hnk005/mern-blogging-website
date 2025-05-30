@@ -2,10 +2,10 @@ import { lazy, Suspense, ReactElement, PropsWithChildren } from "react";
 import { Outlet, RouteObject, createBrowserRouter } from "react-router-dom";
 import paths from "./paths";
 import { AuthPageProps } from "@/pages/AuthPage";
-import PageLoader from "@/components/loader/PageLoader";
-import ProtectRoutes from "@/components/guards/ProtectRoutes";
-import EditorProvider from "@/context/EditorContext";
-import ProtectRoutesAuth from "@/components/guards/ProtectRoutesAuth";
+import PageLoader from "@/shared/loader/PageLoader";
+import ProtectRoutes from "@/shared/guards/ProtectRoutes";
+import ProtectRoutesAuth from "@/shared/guards/ProtectRoutesAuth";
+import BlogProvider from "@/context/BlogContext";
 
 const App = lazy<() => ReactElement>(() => import("@/App"));
 
@@ -27,6 +27,7 @@ const EditorPage = lazy<() => ReactElement>(() => import("@/pages/EditorPage"));
 const ProfilePage = lazy<() => ReactElement>(
   () => import("@/pages/ProfilePage")
 );
+const BlogPage = lazy<() => ReactElement>(() => import("@/pages/BlogPage"));
 const PageNotFound = lazy<() => ReactElement>(() => import("@/pages/404Page"));
 
 const routes: RouteObject[] = [
@@ -61,6 +62,10 @@ const routes: RouteObject[] = [
             element: <ProfilePage />,
           },
           {
+            path: paths.blog + "/:blog_id",
+            element: <BlogPage />,
+          },
+          {
             element: <ProtectRoutesAuth />,
             children: [
               {
@@ -77,13 +82,11 @@ const routes: RouteObject[] = [
       },
       {
         element: (
-          <EditorProvider>
-            <EditorLayout>
-              <Suspense fallback={<PageLoader />}>
-                <Outlet />
-              </Suspense>
-            </EditorLayout>
-          </EditorProvider>
+          <EditorLayout>
+            <Suspense fallback={<PageLoader />}>
+              <Outlet />
+            </Suspense>
+          </EditorLayout>
         ),
         children: [
           {
@@ -91,6 +94,10 @@ const routes: RouteObject[] = [
             children: [
               {
                 path: paths.editor,
+                element: <EditorPage />,
+              },
+              {
+                path: paths.editor + "/:blog_id",
                 element: <EditorPage />,
               },
             ],

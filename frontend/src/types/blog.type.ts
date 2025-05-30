@@ -1,39 +1,39 @@
-import { UserResponse } from "./user.type";
+import { IBlog } from "./backend.type";
 
-export type Blog = {
-  title: string;
-  banner: string;
-  content: any;
-  tags: string[];
-  des: string;
+export interface IEditBlog
+  extends Omit<
+    IBlog,
+    "_id" | "activity" | "blog_id" | "author" | "publishedAt"
+  > {
   author: {
-    profile_img: string;
-    fullname: string;
-    username: string;
+    personal_info: Pick<
+      IBlog["author"]["personal_info"],
+      "fullname" | "username" | "profile_img"
+    >;
   };
-};
+}
 
-export type CreateBlogRequest = {
-  title: string;
-  banner: string;
-  content: any;
-  tags: string[];
-  des: string;
-  draft?: boolean;
-};
+export interface IEditBlogData
+  extends Omit<
+    IBlog,
+    "_id" | "activity" | "author" | "blog_id" | "publishedAt"
+  > {
+  blog_id?: string;
+}
 
-export type BlogResponse = {
-  activity: {
-    total_likes: number;
-    total_comments: number;
-    total_reads: number;
-    total_parent_comments: number;
+export interface IBlogData extends Omit<IBlog, "_id" | "author"> {
+  author: {
+    personal_info: Pick<
+      IBlog["author"]["personal_info"],
+      "fullname" | "username" | "profile_img"
+    >;
   };
-  blog_id: string;
-  title: string;
-  banner: string;
-  des: string;
-  tags: string[];
-  author: UserResponse;
-  publishedAt: string;
-};
+}
+
+export interface IBlogParams {
+  tag: string;
+  limit: number;
+  search?: string;
+  author?: string;
+  eliminateBlog?: string;
+}

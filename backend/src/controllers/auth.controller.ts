@@ -2,9 +2,15 @@ import { NextFunction, Request, Response } from "express";
 import { StatusCodes } from "http-status-codes";
 import bcrypt from "bcryptjs";
 import UserModel from "@/models/User.model";
-import { formatDataToSend, generateUsername } from "@/services/auth.service";
+import {
+  generateAccessToken,
+  generateRefreshToken,
+  generateUsername,
+} from "@/services/auth.service";
 import { APIError } from "@/utils/error";
 import { getAuth } from "firebase-admin/auth";
+import { formatDataResponse, formatDataToSendUser } from "@/utils/format";
+import { redisClient } from "@/config/connectionDB";
 
 export const signup = async (
   req: Request,
@@ -41,9 +47,11 @@ export const signup = async (
 
     await user.save();
 
-    res
-      .status(StatusCodes.CREATED)
-      .json({ message: "Create Account successfully!" });
+    const formatResponse = formatDataResponse({
+      message: "Create Account successfully!",
+    });
+
+    res.status(StatusCodes.CREATED).json(formatResponse);
   } catch (error) {
     next(error);
   }
@@ -88,7 +96,32 @@ export const signin = async (
       }
     }
 
-    res.status(StatusCodes.OK).json(formatDataToSend(user));
+    const userId = user._id as string;
+    const accessToken = generateAccessToken(userId);
+
+    const refreshToken = generateRefreshToken(userId);
+
+    const refreshTokenCookieName =
+      process.env.REFRESH_TOKEN_COOKIE_NAME ?? "refresh_token";
+
+    res.cookie(refreshTokenCookieName, refreshToken, {
+      httpOnly: true,
+      secure: false,
+      sameSite: "strict",
+    });
+
+    await redisClient.set(`refreshToken:${userId}`, refreshToken);
+
+    const formatUser = formatDataToSendUser(user);
+    const formatResponse = formatDataResponse({
+      message: "Login successfully",
+      data: {
+        access_token: accessToken,
+        user: formatUser,
+      },
+    });
+
+    res.status(StatusCodes.OK).json(formatResponse);
   } catch (error) {
     next(error);
   }
@@ -128,27 +161,111 @@ export const googleAuth = async (
           "This email was up without google. Please login with password to access the acount"
         );
       }
+    } else {
+      const username = await generateUsername(email);
 
-      res.status(StatusCodes.OK).json(formatDataToSend(user));
-      return;
+      user = new UserModel({
+        personal_info: {
+          fullname: name,
+          email,
+          profile_img: picture,
+          username,
+        },
+        google_auth: true,
+      });
+
+      await user.save();
     }
 
-    const username = await generateUsername(email);
+    const userId = user._id as string;
+    const accessToken = generateAccessToken(userId);
 
-    user = new UserModel({
-      personal_info: {
-        fullname: name,
-        email,
-        profile_img: picture,
-        username,
-      },
-      google_auth: true,
+    const refreshToken = generateRefreshToken(userId);
+
+    const refreshTokenCookieName =
+      process.env.REFRESH_TOKEN_COOKIE_NAME ?? "refresh_token";
+
+    res.cookie(refreshTokenCookieName, refreshToken, {
+      httpOnly: true,
+      secure: false,
+      sameSite: "strict",
     });
 
-    await user.save();
+    await redisClient.set(`refreshToken:${userId}`, refreshToken);
 
-    res.status(StatusCodes.OK).json(formatDataToSend(user));
+    const formatUser = formatDataToSendUser(user);
+    const formatResponse = formatDataResponse({
+      message: "Login successfully",
+      data: {
+        access_token: accessToken,
+        user: formatUser,
+      },
+    });
+
+    res.status(StatusCodes.OK).json(formatResponse);
   } catch (error) {
     next(error);
+  }
+};
+
+export const refreshToken = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const userId = req.user;
+  try {
+    const accessToken = generateAccessToken(userId);
+
+    const formatData = formatDataResponse({
+      message: "refresh token successfully",
+      data: {
+        access_token: accessToken,
+      },
+    });
+    res.status(StatusCodes.OK).json(formatDataResponse(formatData));
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const signout = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const userId = req.user;
+
+  try {
+    redisClient.del(`refreshToken:${userId}`);
+    res.clearCookie(process.env.REFRESH_TOKEN_COOKIE_NAME);
+    res.status(StatusCodes.OK).json({ message: "Logged out" });
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const me = async (req: Request, res: Response, next: NextFunction) => {
+  const userId = req.user;
+
+  try {
+    const user = await UserModel.findOne({ _id: userId });
+
+    if (!user) {
+      throw new APIError(
+        "BAD_REQUEST",
+        StatusCodes.BAD_REQUEST,
+        "The requested user does not exist."
+      );
+    }
+    const formatUser = formatDataToSendUser(user);
+    const formatData = formatDataResponse({
+      message: "Successfully",
+      data: formatUser,
+    });
+
+    res.status(StatusCodes.OK).json(formatData);
+  } catch (err) {
+    next(err);
   }
 };

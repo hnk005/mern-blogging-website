@@ -1,18 +1,18 @@
-import AnimationWrapper from "@/components/animation/AnimationWrapper";
-import HandleFetch from "@/components/handler/HandleFetch";
-import axiosClient from "@/config/axios";
-import BlogCard from "@/feature/blog/BlogCard";
-import InpageNaviation from "@/feature/home/InpageNaviation";
-import UserCard from "@/feature/user/UserCard";
+import AnimationWrapper from "@/shared/animation/AnimationWrapper";
+import HandleFetch from "@/shared/handler/HandleFetch";
+import { callGetUsers } from "@/config/axios";
+import BlogCard from "@/components/blog/BlogCard";
+import InpageNaviation from "@/components/home/InpageNaviation";
+import UserCard from "@/components/user/UserCard";
 import { useBlogsInfiniteQuery } from "@/hooks/useBlogsInfiniteQuery";
-import { UserResponse } from "@/types/user.type";
 import { useQuery } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
 
 const SearchPage = () => {
   const { query } = useParams();
-  const [limit] = useState(2);
+  const [blogLimit] = useState(5);
+  const [userLimit] = useState(20);
 
   const {
     data,
@@ -21,11 +21,14 @@ const SearchPage = () => {
     isFetchingNextPage,
     isLoading: isLoadingBlogLatest,
     isError: isErrorBlogLatest,
-  } = useBlogsInfiniteQuery({
-    pageName: "search",
-    search: query,
-    limit: limit,
-  });
+  } = useBlogsInfiniteQuery(
+    {
+      tag: "search",
+      search: query,
+      limit: blogLimit,
+    },
+    !!query
+  );
 
   const {
     data: users,
@@ -34,19 +37,18 @@ const SearchPage = () => {
   } = useQuery({
     queryKey: ["user", query],
     queryFn: async () => {
-      const response = await axiosClient.get<{
-        users: UserResponse[];
-      }>(`${import.meta.env.VITE_SERVER_DOMAIN}/user/search`, {
-        params: { username: query },
-      });
-      return response.data.users;
+      if (!query) {
+        return;
+      }
+      const response = await callGetUsers(query, userLimit);
+      return response.data.data;
     },
-    retry: 3,
-    retryDelay: (attemptIndex) => Math.min(1000, 1000 * (attemptIndex + 1)),
+    retry: false,
+    enabled: !!query,
   });
 
-  const blogs = useMemo(
-    () => data?.pages.flatMap((page) => page.results) ?? [],
+  const searchBlogs = useMemo(
+    () => data?.pages.flatMap((page) => page.result) ?? [],
     [data?.pages]
   );
 
@@ -58,12 +60,12 @@ const SearchPage = () => {
           defaultHidden="Account Mathed"
         >
           <HandleFetch
-            data={blogs}
+            data={searchBlogs}
             isLoading={isLoadingBlogLatest}
             isError={isErrorBlogLatest}
-            messageNoData="No blogs published"
+            messageNoData="No searchBlogs published"
           >
-            {blogs?.map((blog, i: number) => (
+            {searchBlogs?.map((blog, i: number) => (
               <AnimationWrapper
                 key={i}
                 transition={{ duration: 1, delay: i * 0.1 }}

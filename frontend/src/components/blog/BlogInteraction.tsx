@@ -17,7 +17,7 @@ const BlogInteraction = () => {
     },
   } = useBlog();
 
-  const username = user.username ?? "";
+  const username = user ? user.username : "";
 
   return (
     <>

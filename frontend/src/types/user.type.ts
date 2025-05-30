@@ -6,6 +6,7 @@ export interface IUserPersonalInfo
     "fullname" | "username" | "profile_img"
   > {}
 
+export interface IAccessTokenResponse extends Pick<IAccount, "access_token"> {}
 export interface IAccount {
   access_token: string;
   user: IUserPersonalInfo;

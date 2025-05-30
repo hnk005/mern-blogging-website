@@ -1,4 +1,11 @@
-import { callSignIn, callSignInWithGoogle, callSignUp } from "@/config/axios";
+import {
+  callMe,
+  callRefreshToken,
+  callSignIn,
+  callSignInWithGoogle,
+  callSignOut,
+  callSignUp,
+} from "@/config/axios";
 import { authWithGoogle } from "@/services/firebase";
 import {
   lookInSession,
@@ -7,7 +14,14 @@ import {
 } from "@/services/session";
 import { IAccount, IUserPersonalInfo } from "@/types/user.type";
 import { handleApiRequest } from "@/utils/handleApi";
-import { createContext, PropsWithChildren, useContext, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import {
+  createContext,
+  PropsWithChildren,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
 import { globalLoading } from "react-global-loading";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
@@ -31,15 +45,43 @@ const AuthContext = createContext({} as AuthContextInterface);
 
 const AuthProvider = ({ children }: PropsWithChildren) => {
   const [user, setUser] = useState<IUserPersonalInfo>(
-    lookInSession("user") || initStateUser
+    lookInSession("user") ?? initStateUser
+  );
+
+  const [accessToken, setAccessToken] = useState(
+    lookInSession("access_token") ?? ""
   );
 
   const { show, hide } = globalLoading;
   const navigate = useNavigate();
 
   const isAuth = () => {
-    return lookInSession("access_token") ? true : false;
+    return accessToken ? true : false;
   };
+
+  const { data: token } = useQuery({
+    queryKey: ["refreshToken"],
+    queryFn: async () => {
+      const res = await callRefreshToken();
+
+      return res.data.data;
+    },
+    retry: false,
+  });
+
+  const {
+    data: userInfo,
+    refetch: refetchUser,
+    isError,
+  } = useQuery({
+    queryKey: ["user"],
+    queryFn: async () => {
+      const res = await callMe();
+      return res.data.data;
+    },
+    retry: false,
+    enabled: false,
+  });
 
   const signUp = async (fullname: string, email: string, password: string) => {
     await handleApiRequest<"">({
@@ -58,16 +100,23 @@ const AuthProvider = ({ children }: PropsWithChildren) => {
 
     if (data?.data) {
       const { access_token, user } = data.data;
-      setUser(data.data.user);
+      setUser(user);
+      setAccessToken(access_token);
       storeInSession("user", user);
       storeInSession("access_token", access_token);
     }
   };
 
-  const signOut = () => {
+  const signOut = async () => {
+    await handleApiRequest<IAccount>({
+      fetch: () => callSignOut(),
+      show: () => show(),
+      hide: () => hide(),
+    });
     removeFromSession("user");
     removeFromSession("access_token");
     setUser(initStateUser);
+    setAccessToken("");
   };
 
   const googleAuth = async () => {
@@ -84,6 +133,7 @@ const AuthProvider = ({ children }: PropsWithChildren) => {
           storeInSession("user", user);
           storeInSession("access_token", access_token);
           setUser(user);
+          setAccessToken(access_token);
           navigate("/");
           toast.success(googleRes.data.message || "Successfully!");
         }
@@ -95,6 +145,38 @@ const AuthProvider = ({ children }: PropsWithChildren) => {
       console.log(error);
     }
   };
+
+  useEffect(() => {
+    if (token) {
+      setAccessToken(token);
+      storeInSession("access_token", token.access_token);
+      refetchUser();
+    }
+  }, [token]);
+
+  useEffect(() => {
+    if (userInfo) {
+      setUser(userInfo);
+      storeInSession("user", userInfo);
+    }
+  }, [userInfo]);
+
+  useEffect(() => {
+    if (isError) {
+      removeFromSession("user");
+      removeFromSession("access_token");
+    }
+  }, [isError]);
+
+  useEffect(() => {
+    const handleForceLogout = () => {
+      setUser(initStateUser);
+      setAccessToken("");
+    };
+
+    window.addEventListener("force-logout", handleForceLogout);
+    return () => window.removeEventListener("force-logout", handleForceLogout);
+  }, []);
 
   return (
     <AuthContext.Provider

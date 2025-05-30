@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import { APIError, errorHandler } from "@/utils/error";
+import { formatDataResponse } from "@/utils/format";
 
 const { isTrustedError, handleError } = errorHandler;
 
@@ -12,11 +13,15 @@ const errorMiddleware = (
   if (!isTrustedError(err)) {
     next(err);
   }
-  const httpCode = err instanceof APIError && err.httpCode;
-  if (httpCode) {
-    res.status(httpCode).json({ message: err.message, error: err.cause });
+  if (err instanceof APIError) {
+    const { message } = err;
+    const cause = (err.cause as []) ?? [];
+    res
+      .status(err.httpCode)
+      .json(formatDataResponse({ message: message, error: cause }));
     return;
   }
+
   handleError(err);
 };
 

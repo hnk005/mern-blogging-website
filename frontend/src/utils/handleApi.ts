@@ -21,7 +21,7 @@ export const handleApiRequest = async <T,>({
       throw res.data;
     }
 
-    toast.success(res.data.message || "Successfully!");
+    toast.success(res.data?.message ?? "Successfully!");
     return res.data;
   } catch (error) {
     if (error instanceof AxiosError) {
@@ -29,7 +29,7 @@ export const handleApiRequest = async <T,>({
       const msg =
         Array.isArray(res?.error) && res.error.length > 0
           ? res.error.join("\n")
-          : res.message || error.message;
+          : res.message ?? error?.message;
       toast.error(msg);
     } else {
       console.error(error);

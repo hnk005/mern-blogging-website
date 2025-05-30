@@ -1,8 +1,13 @@
-import axios from "axios";
 import axiosCustom from "./axios-customize";
-import { IBackendRes, IModelPaginate, IUser } from "@/types/backend.type";
+import { IBackendRes, IModelPaginate } from "@/types/backend.type";
 import { IBlogData, IEditBlogData, IBlogParams } from "@/types/blog.type";
-import { IAccount, IProfile, IUsers } from "@/types/user.type";
+import {
+  IAccessTokenResponse,
+  IAccount,
+  IProfile,
+  IUserPersonalInfo,
+  IUsers,
+} from "@/types/user.type";
 import { getBlogParams } from "@/utils/getParamBlog";
 
 export const callSignUp = (
@@ -28,6 +33,20 @@ export const callSignInWithGoogle = (accessToken: string) => {
   return axiosCustom.post<IBackendRes<IAccount>>("/auth/google-auth", {
     access_token: accessToken,
   });
+};
+
+export const callSignOut = () => {
+  return axiosCustom.post<IBackendRes<IAccount>>("/auth/sign-out");
+};
+
+export const callRefreshToken = () => {
+  return axiosCustom.get<IBackendRes<IAccessTokenResponse>>(
+    "/auth/refresh-token"
+  );
+};
+
+export const callMe = () => {
+  return axiosCustom.get<IBackendRes<IUserPersonalInfo>>("/auth/me");
 };
 
 export const callCreateBlog = (data: IEditBlogData) => {

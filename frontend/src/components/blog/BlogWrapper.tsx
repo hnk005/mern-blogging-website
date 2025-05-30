@@ -42,8 +42,6 @@ const BlogWrapper = () => {
     [data?.pages]
   );
 
-  console.log(blog);
-
   if (isErrorBlog) {
     return <PageNotFound />;
   }

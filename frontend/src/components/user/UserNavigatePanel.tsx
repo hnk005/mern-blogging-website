@@ -4,10 +4,8 @@ import paths from "@/routes/paths";
 import { Link } from "react-router-dom";
 
 const UserNavigatePanel = () => {
-  const {
-    user: { username },
-    signOut,
-  } = useAuth();
+  const { user, signOut } = useAuth();
+  const username = user ? user.username : "";
   return (
     <AnimationWrapper
       className="absolute right-0 z-50"

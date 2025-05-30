@@ -1,6 +1,5 @@
 import AnimationWrapper from "@/shared/animation/AnimationWrapper";
 import DataLoader from "@/shared/loader/DataLoader";
-import axiosClient from "@/config/axios-customize";
 import { useAuth } from "@/context/AuthContext";
 import { useQuery } from "@tanstack/react-query";
 import { Link, useParams } from "react-router-dom";

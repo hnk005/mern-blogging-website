@@ -1,7 +1,6 @@
 import axios from "axios";
 import { Mutex } from "async-mutex";
-import { removeFromSession, storeInSession } from "@/services/session";
-import { IBackendRes } from "@/types/backend.type";
+import { storeInSession } from "@/services/session";
 import { callRefreshToken } from "./axios";
 import { onUnauthorized } from "@/utils/onUnauthorized";
 

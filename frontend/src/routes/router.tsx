@@ -5,7 +5,6 @@ import { AuthPageProps } from "@/pages/AuthPage";
 import PageLoader from "@/shared/loader/PageLoader";
 import ProtectRoutes from "@/shared/guards/ProtectRoutes";
 import ProtectRoutesAuth from "@/shared/guards/ProtectRoutesAuth";
-import BlogProvider from "@/context/BlogContext";
 
 const App = lazy<() => ReactElement>(() => import("@/App"));
 

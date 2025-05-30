@@ -1,4 +1,4 @@
-import UserModel, { IUser } from "@/models/User.model";
+import UserModel from "@/models/User.model";
 import { nanoid } from "nanoid";
 import jwt from "jsonwebtoken";
 import { StringValue } from "ms";

@@ -24,7 +24,7 @@ connectionMongo();
 connectionRedis();
 
 // Routes
-app.use("/api", router);
+app.use("/api/v1", router);
 
 // // Error handling middleware
 app.use(errorMiddleware);

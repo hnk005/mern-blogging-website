@@ -1,6 +1,7 @@
 import Joi from "joi";
 
 export const BlogSchema = Joi.object({
+  blog_id: Joi.string(),
   title: Joi.string().required().messages({
     "string.empty": "You must provide a title to publish the blog",
   }),

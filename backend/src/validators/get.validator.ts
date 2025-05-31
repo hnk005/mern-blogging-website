@@ -3,7 +3,7 @@ import Joi from "joi";
 
 // validate params
 export const ParamsBlogsSchema = Joi.object({
-  id: Joi.string().uuid().required(),
+  id: Joi.string().required(),
 });
 
 export const ParamsUsersSchema = Joi.object({

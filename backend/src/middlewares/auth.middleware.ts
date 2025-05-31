@@ -23,7 +23,7 @@ export const verifyAccessToken = async (
       id: string;
     };
 
-    req.user = decoded.id;
+    req.userId = decoded.id;
 
     next();
   } catch (error: any) {
@@ -64,7 +64,7 @@ export const verifyRefreshToken = async (
       id: string;
     };
 
-    req.user = decoded.id;
+    req.userId = decoded.id;
 
     next();
   } catch (error: any) {

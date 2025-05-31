@@ -208,7 +208,7 @@ export const refreshToken = async (
   res: Response,
   next: NextFunction
 ) => {
-  const userId = req.user;
+  const userId = req.userId;
   try {
     const accessToken = generateAccessToken(userId);
 
@@ -225,12 +225,10 @@ export const refreshToken = async (
 };
 
 export const signout = async (
-  req: Request,
+  _: Request,
   res: Response,
   next: NextFunction
 ) => {
-  const userId = req.user;
-
   try {
     res.clearCookie(process.env.REFRESH_TOKEN_COOKIE_NAME);
     res.status(StatusCodes.OK).json({ message: "Logged out" });
@@ -240,7 +238,7 @@ export const signout = async (
 };
 
 export const me = async (req: Request, res: Response, next: NextFunction) => {
-  const userId = req.user;
+  const userId = req.userId;
 
   try {
     const user = await UserModel.findOne({ _id: userId });

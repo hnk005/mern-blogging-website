@@ -106,8 +106,8 @@ export const signin = async (
 
     res.cookie(refreshTokenCookieName, refreshToken, {
       httpOnly: true,
-      secure: false,
-      sameSite: "strict",
+      secure: true,
+      sameSite: "none",
     });
 
     await redisClient.set(`refreshToken:${userId}`, refreshToken);
@@ -187,8 +187,8 @@ export const googleAuth = async (
 
     res.cookie(refreshTokenCookieName, refreshToken, {
       httpOnly: true,
-      secure: false,
-      sameSite: "strict",
+      secure: true,
+      sameSite: "none",
     });
 
     await redisClient.set(`refreshToken:${userId}`, refreshToken);

@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 import { createClient } from "redis";
 
 export const redisClient = createClient({
-  url: process.env.REDIS_URL || "redis://localhost:6379", // Cấu hình ở đây
+  url: process.env.REDIS_URL || "redis://redis:6379", // Cấu hình ở đây
 });
 
 export const connectionMongo = () => {

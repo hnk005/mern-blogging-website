@@ -5,18 +5,12 @@ import { Request, Response, NextFunction } from "express";
 import { StatusCodes } from "http-status-codes";
 import { nanoid } from "nanoid";
 
-declare module "express-serve-static-core" {
-  interface Request {
-    user: string;
-  }
-}
-
 export const createBlog = async (
   req: Request,
   res: Response,
   next: NextFunction
 ) => {
-  const authorId = req.user;
+  const authorId = req.userId;
 
   const { title, des, banner, tags, content, draft } = req.body;
 
@@ -70,7 +64,7 @@ export const getLatestBlog = async (
 
   try {
     const pageCurrent = Number(page) ?? 1;
-    const maxlimit = Number(limit) ?? 5;
+    const maxlimit = Number(limit) ?? 1;
     const skip = (pageCurrent - 1) * maxlimit;
 
     const findQuery = {} as { [key: string]: any };
@@ -203,7 +197,7 @@ export const updateBlog = async (
   res: Response,
   next: NextFunction
 ) => {
-  const authorId = req.user;
+  const authorId = req.userId;
   const { title, banner, content, tags, des, draft, blog_id } = req.body;
 
   try {

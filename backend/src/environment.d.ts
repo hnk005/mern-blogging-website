@@ -4,7 +4,6 @@ declare global {
     interface ProcessEnv {
       PORT?: string;
       MONGODB_URL: string;
-      REDIS_URL: string;
       SECRET_KEY: string;
       ACCESS_TOKEN_EXPIRESIN?: number | StringValue;
       REFRESH_TOKEN_EXPIRESIN?: number | StringValue;

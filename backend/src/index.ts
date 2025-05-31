@@ -1,7 +1,7 @@
 import process from "process";
 import express, { Express } from "express";
 import dotenv from "dotenv";
-import { connectionMongo, connectionRedis } from "./config/connectionDB";
+import { connectionMongo} from "./config/connectionDB";
 import router from "./routers";
 import middleware from "./config/middleware";
 import errorMiddleware from "./middlewares/error.middleware";
@@ -20,7 +20,6 @@ middleware(app);
 
 // Database Connection
 connectionMongo();
-connectionRedis();
 
 // Routes
 app.use("/api/v1", router);

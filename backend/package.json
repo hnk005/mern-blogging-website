@@ -55,7 +55,6 @@
     "nanoid": "^3.3.11",
     "nodemailer": "^6.10.0",
     "otp-generator": "^4.0.1",
-    "redis": "^4.7.1",
     "uuid": "^11.1.0",
     "winston": "^3.17.0"
   }

@@ -10,7 +10,6 @@ import {
 import { APIError } from "@/utils/error";
 import { getAuth } from "firebase-admin/auth";
 import { formatDataResponse, formatDataToSendUser } from "@/utils/format";
-import { redisClient } from "@/config/connectionDB";
 
 export const signup = async (
   req: Request,
@@ -110,8 +109,6 @@ export const signin = async (
       sameSite: "none",
     });
 
-    await redisClient.set(`refreshToken:${userId}`, refreshToken);
-
     const formatUser = formatDataToSendUser(user);
     const formatResponse = formatDataResponse({
       message: "Login successfully",
@@ -191,8 +188,6 @@ export const googleAuth = async (
       sameSite: "none",
     });
 
-    await redisClient.set(`refreshToken:${userId}`, refreshToken);
-
     const formatUser = formatDataToSendUser(user);
     const formatResponse = formatDataResponse({
       message: "Login successfully",
@@ -237,7 +232,6 @@ export const signout = async (
   const userId = req.user;
 
   try {
-    redisClient.del(`refreshToken:${userId}`);
     res.clearCookie(process.env.REFRESH_TOKEN_COOKIE_NAME);
     res.status(StatusCodes.OK).json({ message: "Logged out" });
   } catch (err) {

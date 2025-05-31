@@ -1,4 +1,3 @@
-import { redisClient } from "@/config/connectionDB";
 import { APIError } from "@/utils/error";
 import { Request, Response, NextFunction } from "express";
 import { StatusCodes } from "http-status-codes";
@@ -64,15 +63,6 @@ export const verifyRefreshToken = async (
     const decoded = jwt.verify(refreshToken, process.env.SECRET_KEY) as {
       id: string;
     };
-
-    const savedToken = await redisClient.get(`refreshToken:${decoded.id}`);
-    if (savedToken != refreshToken) {
-      throw new APIError(
-        "FORBIDDEN",
-        StatusCodes.FORBIDDEN,
-        "Invalid refresh token"
-      );
-    }
 
     req.user = decoded.id;
 

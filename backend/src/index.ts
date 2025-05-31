@@ -6,7 +6,6 @@ import router from "./routers";
 import middleware from "./config/middleware";
 import errorMiddleware from "./middlewares/error.middleware";
 import "./config/firebaseAdmin";
-
 // import { createClient } from "redis";
 
 dotenv.config();

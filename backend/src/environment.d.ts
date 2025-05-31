@@ -9,6 +9,7 @@ declare global {
       ACCESS_TOKEN_EXPIRESIN?: number | StringValue;
       REFRESH_TOKEN_EXPIRESIN?: number | StringValue;
       REFRESH_TOKEN_COOKIE_NAME: string;
+      FIREBASE_ADMIN_CREDENTIAL: string;
     }
   }
 }
